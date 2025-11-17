@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "created": "2025-11-17T17:21:14.156Z",
+  "complexity": {
+    "score": 55,
+    "mode": "STANDARD",
+    "recommendations": [
+      "중간 규모: STANDARD 모드 적합",
+      "테스트 포함: TDD 접근 권장"
+    ]
+  },
+  "estimatedCost": 0
+}

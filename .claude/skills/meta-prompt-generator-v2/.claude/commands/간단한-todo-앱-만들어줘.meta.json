@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "created": "2025-11-17T17:19:40.004Z",
+  "complexity": {
+    "score": 10,
+    "mode": "MINIMAL",
+    "recommendations": [
+      "단순 작업: MINIMAL 모드로 빠르게 처리"
+    ]
+  },
+  "estimatedCost": 0
+}
