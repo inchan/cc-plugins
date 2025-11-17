@@ -24,6 +24,172 @@ This orchestrator adds automation **only where it provides clear value**, mainta
 
 ---
 
+## When to Use This Skill
+
+**Ideal Scenarios:**
+
+1. **Complex Projects** - Multi-step workflows requiring multiple patterns
+   - Example: "Build complete authentication system"
+   - Needs: Router → Sequential → Evaluator pipeline
+
+2. **Automated Quality Enforcement** - Projects requiring consistent quality gates
+   - Example: "Implement API with security requirements"
+   - Automatic evaluation at each stage
+
+3. **Dynamic Pattern Selection** - When optimal pattern isn't obvious
+   - Example: "Optimize database performance"
+   - System analyzes task and selects best pattern
+
+4. **Large-scale Features** - Multiple independent components
+   - Example: "Build dashboard with 5 widgets"
+   - Parallel execution with coordination
+
+**Concrete Use Cases:**
+- "Build full-stack feature with tests and docs"
+- "Migrate legacy module to new architecture"
+- "Implement secure payment processing"
+- "Create microservice with CI/CD pipeline"
+
+---
+
+## When NOT to Use This Skill
+
+**Avoid when:**
+
+1. **Simple Tasks** - Single-step operations
+   - ❌ "Fix typo in README"
+   - ❌ "Add console.log for debugging"
+   - Use no pattern at all instead
+
+2. **Single Pattern Suffices** - Clearly defined pattern needed
+   - ❌ "Run 5 steps sequentially"
+   - Just use sequential-task-processor directly
+
+3. **Exploratory Work** - Requirements still unclear
+   - ❌ "Let's see what we can build"
+   - Use advisor for recommendation first
+
+4. **Tight Deadlines** - No time for orchestration overhead
+   - ❌ "Hotfix needed in 5 minutes"
+   - Direct execution is faster
+
+5. **Learning/Teaching** - Understanding individual patterns
+   - ❌ "How does Sequential pattern work?"
+   - Study individual skills first
+
+---
+
+## Trade-offs and Limitations
+
+### Benefits ✅
+
+1. **Automated Pattern Selection**
+   - System chooses optimal pattern(s) based on task analysis
+   - Reduces decision fatigue
+
+2. **Quality Enforcement**
+   - Built-in evaluation at each stage
+   - Consistent quality gates
+
+3. **Coordination Handling**
+   - Manages pattern transitions automatically
+   - Tracks context and artifacts
+
+4. **Parallel Efficiency**
+   - Identifies parallelization opportunities
+   - Optimizes execution time
+
+### Costs ❌
+
+1. **Overhead**
+   - Analysis and pipeline construction take time
+   - Not suitable for quick tasks
+
+2. **Complexity**
+   - More moving parts than single patterns
+   - Debugging can be harder
+
+3. **Loss of Control**
+   - Automated decisions may not match user preference
+   - Need to understand system's choices
+
+4. **Resource Usage**
+   - Multiple patterns consume more tokens
+   - Higher cost per workflow
+
+### When Overhead is Justified
+
+**✅ Good**:
+- Project takes > 30 minutes
+- Multiple distinct phases
+- Quality is critical
+- Repeated workflow pattern
+
+**❌ Not Worth It**:
+- Task < 10 minutes
+- Single clear approach
+- Experimental/exploratory
+- One-off quick fix
+
+---
+
+## Examples
+
+### Example 1: E-Commerce Feature
+
+**Request**: "Add shopping cart with persistence"
+
+**Orchestrator Analysis**:
+```
+Complexity: 0.65
+Structure: Fixed (clear requirements)
+Pattern: SEQUENTIAL → EVALUATOR
+```
+
+**Execution**:
+```
+Stage 1: SEQUENTIAL
+  Step 1: Cart data model ✓
+  Step 2: Add to cart API ✓
+  Step 3: Cart persistence (Redis) ✓
+  Step 4: Cart sync across devices ✓
+  Step 5: Frontend cart UI ✓
+
+Stage 2: EVALUATOR
+  Functionality: 9.2/10 ✓
+  Performance: 8.8/10 ✓
+
+Result: SUCCESS (1h 15m)
+```
+
+### Example 2: API Modernization
+
+**Request**: "Convert REST API to GraphQL"
+
+**Orchestrator Analysis**:
+```
+Complexity: 0.78
+Discovery Likelihood: HIGH
+Pattern: ORCHESTRATOR (nested patterns)
+```
+
+**Execution**:
+```
+Stage 1: ORCHESTRATOR
+  Discovered: 15 endpoints to convert
+  Phase 1: [PARALLEL] Convert 5 simple endpoints
+  Phase 2: [SEQUENTIAL] Convert complex query endpoints
+  Phase 3: [PARALLEL] Update client code
+
+Stage 2: EVALUATOR
+  API Compatibility: 9.5/10 ✓
+  Performance: 9.0/10 ✓
+
+Result: SUCCESS (3h 45m)
+```
+
+---
+
 ## Architecture
 
 ```
