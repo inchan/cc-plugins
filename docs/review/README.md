@@ -75,4 +75,4 @@
 
 ---
 
-전체 종합 보고서는 [SKILL_REVIEW_REPORTS.md](../../SKILL_REVIEW_REPORTS.md)를 참조하세요.
+전체 종합 보고서는 [SKILL_REVIEW_REPORTS.md](../reports/SKILL_REVIEW_REPORTS.md)를 참조하세요.
