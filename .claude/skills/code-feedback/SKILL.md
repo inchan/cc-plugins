@@ -1,9 +1,24 @@
 ---
 name: code-feedback
-description: Claude Code 결과를 분석하고 TDD/SOLID 기반의 반복적 피드백 루프를 통해 코드 품질을 개선합니다. 조사-분석-착수-계획 후 구현-리뷰-개선-검증 사이클을 실행하며, 검증 실패시 자동으로 반복합니다.
+description: Claude Code 작업 결과를 6개 영역(분석, 계획, 구현, 리뷰, 검증, 테스트)에서 평가하고 구체적인 피드백을 생성합니다. 결과 수집, 영역별 점수화, P0/P1/P2 우선순위 피드백, 자기비판, 성찰, 재평가 사이클을 통해 품질을 개선합니다. Use when evaluating code results, generating feedback, reviewing implementation quality, assessing test coverage.
 ---
 
 # Code Feedback - 결과 기반 피드백 생성기
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Phase 1: 결과 수집](#phase-1-결과-수집-collection)
+- [Phase 2: 영역별 평가](#phase-2-영역별-평가-evaluation)
+- [Phase 3: 피드백 생성](#phase-3-피드백-생성-feedback-generation)
+- [Phase 4: 자기비판](#phase-4-자기비판-self-critique)
+- [Phase 5: 성찰](#phase-5-성찰-reflection)
+- [Phase 6: 개선 및 재평가](#phase-6-개선-및-재평가-improvement--re-evaluation)
+- [사용 예시](#사용-예시)
+- [설정 옵션](#설정-옵션)
+- [Best Practices](#best-practices)
+
+---
 
 ## Overview
 
