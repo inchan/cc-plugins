@@ -161,14 +161,18 @@ From the user's brief request, identify:
 - [ ] 메모리 사용량 적정
 - [ ] DB 쿼리 최적화
 
-### 🔄 다중 메트릭 평가
+### 🔄 품질 평가 (Step 4 자동 루프 적용 시)
 
-| 메트릭 | 목표값 | 우선순위 |
-|--------|--------|----------|
-| **정확도 (Accuracy)** | 요구사항 충족도 > 95% | High |
-| **효율성 (Efficiency)** | 최소 API 호출, 최적 쿼리 | Medium |
-| **명확성 (Clarity)** | 코드 가독성, 문서화 수준 | Medium |
-| **호환성 (Compatibility)** | 기존 시스템과 충돌 없음 | High |
+복잡한 작업의 경우 Step 4의 자동 개선 루프를 통해 요구사항 품질을 평가합니다:
+
+| 차원 | 목표값 | 가중치 |
+|------|--------|--------|
+| **완전성 (Completeness)** | 모든 요구사항, 엣지케이스, 에러처리 포함 | 30% |
+| **명확성 (Clarity)** | 모호함 없음, 측정 가능한 기준 | 25% |
+| **일관성 (Consistency)** | 프로젝트 패턴/용어 일치 | 25% |
+| **실행가능성 (Feasibility)** | 기술적 구현 가능, 의존성 해결 | 20% |
+
+**목표**: 총점 ≥ 18/20 (90%)
 
 ### 🔍 확인 사항
 - [Any questions or clarifications needed]
@@ -178,24 +182,11 @@ From the user's brief request, identify:
 이 요구사항으로 진행할까요? 수정이 필요한 부분이 있다면 말씀해주세요.
 ```
 
-### Step 4: Present to User
+### Step 4: Automated Improvement Loop (Evaluator-Optimizer Pattern)
 
-**Important**: After creating the enhanced requirements, present them to the user and ask for confirmation:
+복잡한 작업(Extended Template)의 경우, 사용자에게 제시하기 전에 **자동 개선 루프**를 실행합니다.
 
-```
-위 요구사항을 분석해서 정리했습니다. 
-
-이대로 진행해도 될까요? 
-수정하거나 추가할 내용이 있으면 말씀해주세요!
-```
-
-**Do NOT implement** until the user confirms. The goal is to clarify requirements first.
-
-### Step 5: Automated Improvement Loop (Evaluator-Optimizer Pattern)
-
-복잡한 작업(Extended Template)의 경우, 요구사항을 제시하기 전에 **자동 개선 루프**를 실행합니다.
-
-#### 5.1 점수 기반 평가 시스템
+#### 4.1 점수 기반 평가 시스템
 
 4개 차원에서 각 5점 만점으로 평가 (총 20점):
 
@@ -245,7 +236,7 @@ From the user's brief request, identify:
 - [ ] 명확한 구현 경로 (+1)
 ```
 
-#### 5.2 약점 분석 및 개선 피드백
+#### 4.2 약점 분석 및 개선 피드백
 
 평가에서 발견된 약점을 구체적으로 분석:
 
@@ -284,7 +275,7 @@ From the user's brief request, identify:
 - 총점: 현재 → 목표
 ```
 
-#### 5.3 자동 반복 루프
+#### 4.3 자동 반복 루프
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -312,7 +303,7 @@ From the user's brief request, identify:
                             (루프 반복)
 ```
 
-#### 5.4 종료 조건 (Termination Conditions)
+#### 4.4 종료 조건 (Termination Conditions)
 
 ```markdown
 ## 🛑 반복 종료 조건 체크
@@ -336,7 +327,7 @@ From the user's brief request, identify:
 → **CONTINUE**: 다음 반복 진행
 ```
 
-#### 5.5 반복 추적 (Progress Tracking)
+#### 4.5 반복 추적 (Progress Tracking)
 
 ```markdown
 ## 📈 개선 추적
@@ -359,7 +350,7 @@ From the user's brief request, identify:
 ✅ 총점 19/20 (95%) - 목표 달성
 ```
 
-#### 5.6 완전한 자동 루프 예제
+#### 4.6 완전한 자동 루프 예제
 
 ```markdown
 ## 🔄 자동 개선 루프 실행
@@ -439,6 +430,24 @@ From the user's brief request, identify:
 | **표준 (Standard)** | 선택적 (1회) | 명확성 검증만 |
 | **복잡 (Complex)** | **필수 (최대 3회)** | 품질이 측정 가능하게 개선됨 |
 
+### Step 5: Present to User
+
+자동 개선 루프를 완료한 후, 최종 요구사항을 사용자에게 제시합니다.
+
+```
+위 요구사항을 분석해서 정리했습니다.
+
+[자동 개선 루프 결과: 3회 반복으로 13점 → 19점 개선 (95%)]
+
+이대로 진행해도 될까요?
+수정하거나 추가할 내용이 있으면 말씀해주세요!
+```
+
+**Important**:
+- 자동 루프 결과를 간략히 요약하여 사용자에게 신뢰성 제공
+- **Do NOT implement** until the user confirms
+- 남은 불확실성이나 확인 사항을 명시
+
 ---
 
 ## Complexity-Based Templates
@@ -506,7 +515,46 @@ CRUD 작업, 단일 파일 수정, 기존 패턴 재사용에 적합합니다.
 ### Extended Template (복잡 작업)
 
 아키텍처 변경, 다중 시스템 통합, 보안 관련 작업에 적합합니다.
-**위 전체 템플릿**을 사용합니다 (Layer 1-3 완전 구성).
+
+**사용 방법**:
+1. Step 3의 전체 템플릿 (Layer 1-3)으로 요구사항 생성
+2. **Step 4 자동 루프 필수 실행** (최대 3회)
+3. 목표 점수(18/20) 달성 후 Step 5에서 사용자에게 제시
+
+```markdown
+# [기능명] 구현 요구사항
+
+---
+
+## Layer 1: 컨텍스트 레이어
+[프로젝트 컨텍스트, 기존 패턴, 위험도 분석 - 전체 구성]
+
+---
+
+## Layer 2: 인스트럭션 레이어
+[구현 범위, 파일 구조, 상세 요구사항 - 전체 구성]
+
+---
+
+## Layer 3: 검증 레이어
+[GOLDEN 평가 기준, 성공 기준 체크리스트, 품질 평가 - 전체 구성]
+
+---
+
+## 자동 개선 루프 결과
+
+| 반복 | 완전성 | 명확성 | 일관성 | 실행가능성 | 총점 |
+|------|--------|--------|--------|------------|------|
+| 초기 | 3 | 3 | 4 | 3 | 13 |
+| 최종 | 5 | 5 | 5 | 4 | 19 |
+
+**개선 내역**: [주요 변경 사항]
+**종료 이유**: 총점 19/20 (95%) - 목표 달성
+
+---
+
+이 요구사항으로 진행할까요?
+```
 
 ---
 
