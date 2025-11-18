@@ -1076,6 +1076,7 @@ async function main(): Promise<void> {
   }
 }
 
-if (require.main === module) {
+// ESM entry point check
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(console.error);
 }

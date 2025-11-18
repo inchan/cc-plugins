@@ -1,16 +1,17 @@
 {
   "name": "meta-prompt-generator-v2",
   "version": "2.0.0",
-  "description": "적응형 복잡도, 자기 평가, 비용 인식을 갖춘 차세대 메타프롬프트 생성기",
+  "description": "적응형 복잡도, 자기 평가, 비용 인식을 갖춘 메타프롬프트 생성기",
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "analyze-complexity": "npx ts-node complexity-analyzer.ts",
-    "track-cost": "npx ts-node cost-tracker.ts",
-    "evaluate": "npx ts-node self-evaluator.ts",
-    "test-recovery": "npx ts-node failure-recovery.ts",
-    "generate-tests": "npx ts-node test-generator.ts",
-    "lint": "eslint . --ext .ts",
+    "start": "npx tsx index.ts",
+    "analyze-complexity": "npx tsx complexity-analyzer.ts",
+    "track-cost": "npx tsx cost-tracker.ts",
+    "evaluate": "npx tsx self-evaluator.ts",
+    "test-recovery": "npx tsx failure-recovery.ts",
+    "generate-tests": "npx tsx test-generator.ts",
+    "test": "npx tsx --test __tests__/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
@@ -24,6 +25,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.0.0"
   },
   "engines": {

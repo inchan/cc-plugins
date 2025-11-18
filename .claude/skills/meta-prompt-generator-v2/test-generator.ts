@@ -515,7 +515,7 @@ import (
 }
 
 // 사용 예시
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const generator = new TestGenerator();
 
   const { code, suite } = generator.generateCompleteTestFile("jest", {

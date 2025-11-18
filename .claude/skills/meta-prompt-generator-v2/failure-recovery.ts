@@ -456,7 +456,7 @@ export const PRESET_STRATEGIES = {
 };
 
 // 사용 예시
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const manager = new FailureRecoveryManager();
 
   // 전략 등록

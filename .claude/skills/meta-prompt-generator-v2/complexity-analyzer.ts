@@ -217,7 +217,7 @@ export function quickComplexityEstimate(
 }
 
 // 사용 예시
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const result = analyzeComplexity(
     {
       estimatedFiles: 25,

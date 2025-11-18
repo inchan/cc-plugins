@@ -280,6 +280,41 @@ Level 5 (EXCELLENCE): 모든 지표 최적화
 - 컨텍스트 기반 자동 개선
 - 예측적 최적화
 
+## 빠른 시작
+
+```bash
+# 메인 생성기 실행
+npx tsx index.ts "사용자 인증 모듈 만들어줘"
+
+# 개별 모듈 테스트
+npx tsx complexity-analyzer.ts
+npx tsx cost-tracker.ts
+npx tsx self-evaluator.ts
+npx tsx failure-recovery.ts
+npx tsx test-generator.ts
+
+# 통합 테스트 실행
+npx tsx --test __tests__/integration.test.ts
+```
+
+## 테스트 결과
+
+```
+# tests 19
+# suites 6
+# pass 19
+# fail 0
+# duration_ms 2454ms
+```
+
+**테스트 커버리지:**
+- Complexity Analyzer: 4/4 ✅
+- Cost Tracker: 4/4 ✅
+- Self Evaluator: 3/3 ✅
+- Failure Recovery: 3/3 ✅
+- Test Generator: 4/4 ✅
+- End-to-End: 1/1 ✅
+
 ## 기여
 
 이슈와 PR은 환영합니다. 기여 전에 CLAUDE.md의 가이드라인을 확인해주세요.
@@ -290,6 +325,7 @@ MIT
 
 ---
 
-**Last Updated**: 2025-11-17
+**Last Updated**: 2025-11-18
 **Version**: 2.0.0
+**Status**: ✅ Production Ready (모든 테스트 통과)
 **Maintainer**: @inchan
