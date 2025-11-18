@@ -237,6 +237,54 @@
                     "captureMessage"
                 ]
             }
+        },
+        "code-feedback": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "TDD/SOLID 기반 반복적 코드 피드백 및 개선 루프",
+            "promptTriggers": {
+                "keywords": [
+                    "피드백",
+                    "feedback",
+                    "TDD",
+                    "SOLID",
+                    "리뷰",
+                    "review",
+                    "리팩토링",
+                    "refactoring",
+                    "코드 개선",
+                    "code improvement",
+                    "테스트 주도",
+                    "test driven",
+                    "품질 개선",
+                    "quality improvement",
+                    "반복 개선",
+                    "iterative improvement"
+                ],
+                "intentPatterns": [
+                    "(피드백|feedback).*?(생성|제공|분석)",
+                    "(TDD|테스트 주도).*?(개발|구현|리팩토링)",
+                    "(SOLID|솔리드).*?(원칙|적용|개선)",
+                    "(리뷰|review).*?(코드|결과)",
+                    "(개선|improve|enhance).*?(코드|품질|quality)",
+                    "(반복|iterative).*?(개선|improvement)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "**/*.ts",
+                    "**/*.tsx",
+                    "**/*.js",
+                    "**/*.jsx",
+                    "**/*.py"
+                ],
+                "pathExclusions": [
+                    "**/node_modules/**",
+                    "**/dist/**",
+                    "**/build/**"
+                ]
+            }
         }
     },
     "notes": {
