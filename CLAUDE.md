@@ -1,3 +1,107 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Repository Purpose
+
+This is a Claude Code skills and hooks collection - a toolkit for extending Claude Code capabilities with specialized skills, workflows, subagents, and hooks.
+
+## Quick Start for Tool Creation
+
+**When users want to create any Claude Code tool (command, skill, subagent, hook):**
+1. Use the `skill-generator-tool` skill first to analyze intent and recommend the optimal tool type
+2. Route to specialized creators: `command-creator`, `skill-creator`, `subagent-creator`, `hooks-creator`
+
+## Core Architecture
+
+### Directory Structure
+```
+.claude/
+├── skills/           # 22+ skills (SKILL.md + bundled resources)
+├── commands/         # Slash commands (.md files)
+├── agents/           # Subagents (.md files)
+├── hooks/            # Event hooks (shell scripts)
+└── settings.local.json  # Hook configuration
+```
+
+### Key Configuration Files
+- `.claude/skills/skill-rules.json` - Skill auto-activation triggers (keywords, intent patterns)
+- `.claude/settings.local.json` - Hook registration and permissions
+
+### Skill Categories
+
+1. **Tool Creators** (highest priority for tool creation tasks):
+   - `skill-generator-tool` - Entry point, recommends optimal tool type
+   - `command-creator`, `skill-creator`, `subagent-creator`, `hooks-creator`
+
+2. **Workflow Management**:
+   - `agent-workflow-manager`, `intelligent-task-router`, `parallel-task-executor`
+   - `dynamic-task-orchestrator`, `sequential-task-processor`
+
+3. **Development Guidelines**:
+   - `frontend-dev-guidelines` - React/TypeScript/MUI v7
+   - `backend-dev-guidelines` - Node.js/Express/Prisma
+   - `error-tracking` - Sentry v8 patterns
+
+## Development Commands
+
+### Skill Initialization
+```bash
+# Create new skill
+python3 .claude/skills/skill-creator/scripts/init_skill.py <name> --path .claude/skills
+
+# Create new command
+python3 .claude/skills/command-creator/scripts/init_command.py <name> "description" --location project
+
+# Create new subagent
+python3 .claude/skills/subagent-creator/scripts/init_subagent.py <name> "description" --template <template>
+
+# Create new hook
+python3 .claude/skills/hooks-creator/scripts/init_hook.py <name> --event <event> --path .claude/hooks
+```
+
+### Validation
+```bash
+# Validate command
+python3 .claude/skills/command-creator/scripts/validate_command.py .claude/commands/<name>.md
+
+# Validate subagent
+python3 .claude/skills/subagent-creator/scripts/validate_subagent.py .claude/agents/<name>.md
+
+# Package skill for distribution
+python3 .claude/skills/skill-creator/scripts/package_skill.py .claude/skills/<name>
+```
+
+### Intent Analysis (for skill-generator-tool)
+```bash
+python3 .claude/skills/skill-generator-tool/scripts/analyze_intent.py "user request"
+```
+
+## Important Patterns
+
+### Skill Auto-Activation
+Skills trigger automatically via `skill-rules.json` patterns. The `UserPromptSubmit` hook (`skill-activation-prompt.ts`) analyzes prompts and suggests relevant skills.
+
+### Progressive Disclosure
+Skills use three-level loading:
+1. Metadata (name + description) - Always in context
+2. SKILL.md body - When skill triggers
+3. Bundled resources - As needed
+
+### Tool Type Selection
+- **Command**: User-invoked prompt shortcuts (`/format`, `/review-pr`)
+- **Skill**: Domain expertise with bundled resources
+- **Subagent**: Focused AI agents with restricted permissions
+- **Hook**: Event-driven automation (PreToolUse, PostToolUse, Stop)
+- **Plugin**: Package multiple tools together
+
+## Official Documentation References
+- [Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
+- [Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
+- [Plugins](https://claude.com/blog/claude-code-plugins)
+
+---
+
 # Claude Code Skills & Hooks - 통합 관리 가이드
 
 **최종 업데이트**: 2025-11-17

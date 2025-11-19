@@ -291,6 +291,44 @@
                     "**/build/**"
                 ]
             }
+        },
+        "skill-generator-tool": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "critical",
+            "description": "Unified tool generator that recommends and routes to the optimal Claude Code tool type (Command, Skill, Subagent, Hook)",
+            "promptTriggers": {
+                "keywords": [
+                    "create tool",
+                    "generate tool",
+                    "make tool",
+                    "tool type",
+                    "which tool",
+                    "automate",
+                    "automation",
+                    "extend capabilities",
+                    "create command",
+                    "create skill",
+                    "create subagent",
+                    "create hook",
+                    "create agent",
+                    "tool generator",
+                    "tool creator",
+                    "도구 생성",
+                    "자동화",
+                    "what should I use",
+                    "how do I automate"
+                ],
+                "intentPatterns": [
+                    "(create|make|build|generate).*?(tool|command|skill|subagent|hook|agent)",
+                    "(which|what).*?(tool|type).*?(should|use|best)",
+                    "(automate|automation).*?(create|build|make)",
+                    "(extend|add).*?(capabilities|functionality)",
+                    "(unsure|not sure|don't know).*?(tool|type|which)",
+                    "how.*?(automate|create).*?(workflow|process)",
+                    "(recommend|suggest).*?(tool|type)"
+                ]
+            }
         }
     },
     "notes": {
