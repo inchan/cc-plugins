@@ -53,6 +53,52 @@ interface MatchedEnhancement {
     priority: string;
 }
 
+// Complexity analysis for default workflow recommendation
+function analyzeComplexity(prompt: string): { skill: string; reason: string } {
+    const lowerPrompt = prompt.toLowerCase();
+    const length = prompt.length;
+
+    // Keywords for parallel execution
+    const parallelKeywords = ['여러', '동시', '병렬', 'parallel', 'concurrent', '각각', '모두', '전부'];
+    const hasParallelIntent = parallelKeywords.some(kw => lowerPrompt.includes(kw));
+
+    // Keywords for complex/orchestration
+    const complexKeywords = ['복잡', '전체', '통합', '대규모', 'complex', 'full', 'entire', '시스템', '아키텍처'];
+    const hasComplexIntent = complexKeywords.some(kw => lowerPrompt.includes(kw));
+
+    // Keywords for simple sequential
+    const simpleKeywords = ['간단', '단순', '하나', 'simple', 'single', 'quick', '빠르게'];
+    const hasSimpleIntent = simpleKeywords.some(kw => lowerPrompt.includes(kw));
+
+    // Decision logic
+    if (hasSimpleIntent || length < 50) {
+        return {
+            skill: 'sequential-task-processor',
+            reason: '간단한 순차 작업에 적합'
+        };
+    }
+
+    if (hasParallelIntent) {
+        return {
+            skill: 'parallel-task-executor',
+            reason: '독립 작업 병렬 처리에 최적'
+        };
+    }
+
+    if (hasComplexIntent || length > 200) {
+        return {
+            skill: 'dynamic-task-orchestrator',
+            reason: '복잡한 프로젝트 조율에 적합'
+        };
+    }
+
+    // Default
+    return {
+        skill: 'agent-workflow-manager',
+        reason: '자동 워크플로우 분석 및 실행'
+    };
+}
+
 async function main() {
     try {
         // Read input from stdin
@@ -230,6 +276,20 @@ async function main() {
             } else {
                 output += 'ACTION: Use Skill tool BEFORE responding\n';
             }
+            output += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+
+            console.log(output);
+        } else if (originalPrompt.length > 20) {
+            // No matches found - recommend default workflow based on complexity
+            const recommendation = analyzeComplexity(originalPrompt);
+
+            let output = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            output += '🎯 SKILL ACTIVATION CHECK\n';
+            output += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+            output += '💡 DEFAULT WORKFLOW RECOMMENDATION:\n';
+            output += `  → ${recommendation.skill}\n`;
+            output += `    (${recommendation.reason})\n\n`;
+            output += 'TIP: /auto-workflow 커맨드로 자동 분석 실행 가능\n';
             output += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
 
             console.log(output);
