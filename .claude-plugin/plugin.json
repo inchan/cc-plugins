@@ -19,8 +19,6 @@
     "development-guidelines",
     "task-orchestration"
   ],
-  "commands": "./.claude/commands/",
   "agents": "./agents/",
-  "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "hooks": "./hooks/hooks.json"
 }
