@@ -1,0 +1,128 @@
+{
+  "$schema": "prompt-enhancement-rules-schema",
+  "version": "1.0.0",
+  "description": "Rules for automatic prompt enhancement based on detected patterns",
+
+  "enhancementRules": {
+    "backend-api": {
+      "patterns": ["api", "endpoint", "route", "controller", "service", "백엔드", "라우트"],
+      "suggestions": [
+        "Express 라우트 패턴 적용 (routes → controllers → services → repositories)",
+        "Zod 스키마 검증 추가",
+        "Sentry 에러 추적 포함",
+        "BaseController 패턴 사용"
+      ],
+      "relatedSkill": "backend-dev-guidelines",
+      "priority": "high"
+    },
+
+    "frontend-component": {
+      "patterns": ["component", "ui", "페이지", "컴포넌트", "react", "프론트"],
+      "suggestions": [
+        "React Suspense + lazy loading 패턴",
+        "MUI v7 sx prop 스타일링",
+        "TanStack Router 사용",
+        "useSuspenseQuery로 데이터 페칭"
+      ],
+      "relatedSkill": "frontend-dev-guidelines",
+      "priority": "high"
+    },
+
+    "error-handling": {
+      "patterns": ["error", "에러", "exception", "sentry", "추적", "모니터링"],
+      "suggestions": [
+        "Sentry v8 captureException 사용",
+        "setTag/setContext로 메타데이터 추가",
+        "트랜잭션 기반 성능 모니터링"
+      ],
+      "relatedSkill": "error-tracking",
+      "priority": "high"
+    },
+
+    "testing": {
+      "patterns": ["test", "테스트", "검증", "route test", "api test"],
+      "suggestions": [
+        "test-auth-route.js 스크립트 사용",
+        "쿠키 기반 인증 테스트",
+        "모의 인증 패턴 적용"
+      ],
+      "relatedSkill": "route-tester",
+      "priority": "medium"
+    },
+
+    "workflow-automation": {
+      "patterns": ["워크플로우", "자동화", "workflow", "automation", "프로세스"],
+      "suggestions": [
+        "복잡도 분석 후 적절한 워크플로우 선택",
+        "Router → Processor → Evaluator 체인",
+        "병렬 처리 가능 여부 확인"
+      ],
+      "relatedSkill": "agent-workflow-manager",
+      "priority": "critical"
+    },
+
+    "parallel-processing": {
+      "patterns": ["병렬", "parallel", "동시", "concurrent", "sectioning"],
+      "suggestions": [
+        "독립 작업 식별 및 분리",
+        "Sectioning 모드로 2-10x 속도 향상",
+        "Voting 모드로 다중 접근 비교"
+      ],
+      "relatedSkill": "parallel-task-executor",
+      "priority": "high"
+    },
+
+    "quality-optimization": {
+      "patterns": ["품질", "최적화", "개선", "optimize", "enhance", "quality", "평가"],
+      "suggestions": [
+        "5개 차원 평가 (기능성, 성능, 코드 품질, 보안, 문서)",
+        "최대 5회 반복 개선",
+        "구체적인 개선 피드백 적용"
+      ],
+      "relatedSkill": "iterative-quality-enhancer",
+      "priority": "high"
+    },
+
+    "skill-development": {
+      "patterns": ["스킬", "skill", "훅", "hook", "커맨드", "command"],
+      "suggestions": [
+        "YAML frontmatter 메타데이터 작성",
+        "트리거 패턴 정의 (keywords, intentPatterns)",
+        "500줄 이하 규칙 준수"
+      ],
+      "relatedSkill": "skill-developer",
+      "priority": "high"
+    },
+
+    "prompt-creation": {
+      "patterns": ["프롬프트", "prompt", "명령", "생성"],
+      "suggestions": [
+        "구조화된 단계별 처리",
+        "명확한 입출력 정의",
+        "에러 처리 포함"
+      ],
+      "relatedSkill": "meta-prompt-generator-v2",
+      "priority": "high"
+    },
+
+    "dual-ai": {
+      "patterns": ["codex", "qwen", "협업", "loop", "dual", "ai 연동"],
+      "suggestions": [
+        "역할 분리 (구현자/리뷰어)",
+        "CLI 어댑터 선택",
+        "피드백 루프 설정"
+      ],
+      "relatedSkill": "dual-ai-loop",
+      "priority": "medium"
+    }
+  },
+
+  "globalContext": {
+    "projectType": "claude-code-skills",
+    "conventions": [
+      "TypeScript 우선",
+      "함수형 패턴 선호",
+      "명시적 에러 처리"
+    ]
+  }
+}
