@@ -1,0 +1,655 @@
+{
+    "version": "1.0",
+    "description": "Skill activation triggers for Claude Code. Controls when skills automatically suggest or block actions.",
+    "skills": {
+        "skill-developer": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Meta-skill for creating and managing Claude Code skills",
+            "promptTriggers": {
+                "keywords": [
+                    "skill system",
+                    "create skill",
+                    "add skill",
+                    "skill triggers",
+                    "skill rules",
+                    "hook system",
+                    "skill development",
+                    "skill-rules.json",
+                    "스킬",
+                    "스킬 생성",
+                    "스킬 만들"
+                ],
+                "intentPatterns": [
+                    "(how do|how does|explain).*?skill",
+                    "(create|add|modify|build).*?skill",
+                    "skill.*?(work|trigger|activate|system)",
+                    "스킬.*?(만들|생성|추가)"
+                ]
+            }
+        },
+        "meta-prompt-generator-v2": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "슬래시 커맨드용 프롬프트 생성 (간결하고 실용적인 접근)",
+            "promptTriggers": {
+                "keywords": [
+                    "프롬프트 생성",
+                    "메타 프롬프트",
+                    "슬래시 커맨드",
+                    "커스텀 프롬프트",
+                    "커맨드 생성",
+                    "프롬프트 작성",
+                    "프롬프트",
+                    "prompt",
+                    "command"
+                ],
+                "intentPatterns": [
+                    "(create|generate|make|build).*?(prompt|command|slash)",
+                    "(슬래시|slash).*?(커맨드|command).*?(생성|만들)",
+                    "프롬프트.*?(만들|생성|작성)",
+                    "(커맨드|command).*?(생성|만들|create)"
+                ]
+            }
+        },
+        "backend-dev-guidelines": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Backend development patterns for Node.js/Express/TypeScript",
+            "promptTriggers": {
+                "keywords": [
+                    "backend",
+                    "backend development",
+                    "microservice",
+                    "controller",
+                    "service",
+                    "repository",
+                    "route",
+                    "routing",
+                    "express",
+                    "API",
+                    "endpoint",
+                    "middleware",
+                    "validation",
+                    "Zod",
+                    "Prisma",
+                    "database access",
+                    "BaseController",
+                    "dependency injection",
+                    "unifiedConfig",
+                    "configuration"
+                ],
+                "intentPatterns": [
+                    "(create|add|implement|build).*?(route|endpoint|API|controller|service|repository)",
+                    "(fix|handle|debug).*?(error|exception|backend)",
+                    "(add|implement).*?(middleware|validation|error.*?handling)",
+                    "(organize|structure|refactor).*?(backend|service|API)",
+                    "(how to|best practice).*?(backend|route|controller|service)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "blog-api/src/**/*.ts",
+                    "auth-service/src/**/*.ts",
+                    "notifications-service/src/**/*.ts",
+                    "backend/**/*.ts",
+                    "api/**/*.ts",
+                    "server/**/*.ts",
+                    "services/**/*.ts"
+                ],
+                "pathExclusions": [
+                    "**/*.test.ts",
+                    "**/*.spec.ts"
+                ],
+                "contentPatterns": [
+                    "router\\.",
+                    "app\\.(get|post|put|delete|patch)",
+                    "export.*Controller",
+                    "export.*Service",
+                    "prisma\\."
+                ]
+            }
+        },
+        "frontend-dev-guidelines": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "React/TypeScript best practices including MUI v7 compatibility",
+            "promptTriggers": {
+                "keywords": [
+                    "component",
+                    "react component",
+                    "UI",
+                    "interface",
+                    "page",
+                    "modal",
+                    "dialog",
+                    "form",
+                    "MUI",
+                    "Material-UI",
+                    "Grid",
+                    "styling",
+                    "frontend",
+                    "React"
+                ],
+                "intentPatterns": [
+                    "(create|add|make|build|update|modify|edit).*?(component|UI|page|modal|dialog|form)",
+                    "(how to|best practice).*?(component|react|MUI)",
+                    "(style|design|layout).*?(component|UI)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "frontend/src/**/*.tsx",
+                    "frontend/src/**/*.ts",
+                    "client/src/**/*.tsx",
+                    "client/src/**/*.ts",
+                    "src/**/*.tsx"
+                ],
+                "pathExclusions": [
+                    "**/*.test.tsx",
+                    "**/*.test.ts",
+                    "**/*.spec.tsx",
+                    "**/*.spec.ts",
+                    "**/*.styles.ts",
+                    "**/vite.config.ts",
+                    "**/tsconfig.json"
+                ],
+                "contentPatterns": [
+                    "from '@mui/material';",
+                    "import.*Grid.*from.*@mui",
+                    "<Grid ",
+                    "Grid2",
+                    "Unstable_Grid",
+                    "makeStyles",
+                    "@material-ui/core"
+                ]
+            }
+        },
+        "route-tester": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Testing authenticated API routes with JWT cookie-based auth",
+            "promptTriggers": {
+                "keywords": [
+                    "test route",
+                    "test endpoint",
+                    "test API",
+                    "route testing",
+                    "API testing",
+                    "authenticated route",
+                    "JWT testing",
+                    "cookie auth",
+                    "test with auth",
+                    "라우트 테스트",
+                    "엔드포인트 테스트",
+                    "엔드포인트 검증",
+                    "인증 테스트",
+                    "API 테스트"
+                ],
+                "intentPatterns": [
+                    "(test|debug|verify).*?(route|endpoint|API)",
+                    "(how to|how do I).*?test.*?(route|endpoint|API)",
+                    "test.*?(authenticated|auth|JWT|cookie)",
+                    "(라우트|엔드포인트).*?(테스트|검증)",
+                    "(인증|auth).*?(검증|테스트)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "**/routes/**/*.ts",
+                    "**/test-*.js",
+                    "**/test-*.ts"
+                ],
+                "contentPatterns": [
+                    "router\\.(get|post|put|delete|patch)",
+                    "app\\.(get|post|put|delete|patch)"
+                ]
+            }
+        },
+        "error-tracking": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Sentry error tracking and performance monitoring patterns",
+            "promptTriggers": {
+                "keywords": [
+                    "error handling",
+                    "exception",
+                    "sentry",
+                    "error tracking",
+                    "captureException",
+                    "monitoring",
+                    "performance tracking",
+                    "에러 핸들링",
+                    "에러 처리",
+                    "예외 처리",
+                    "에러 추적"
+                ],
+                "intentPatterns": [
+                    "(add|create|implement|setup).*?(error handling|sentry|error tracking)",
+                    "(fix|handle|catch).*?(error|exception)",
+                    "(how to|best practice).*?(error|sentry|monitoring)",
+                    "(에러|예외).*?(핸들링|처리|추적)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "**/instrument.ts",
+                    "**/sentry*.ts",
+                    "**/*Controller.ts",
+                    "**/*Service.ts"
+                ],
+                "contentPatterns": [
+                    "@sentry",
+                    "Sentry\\.",
+                    "captureException",
+                    "captureMessage"
+                ]
+            }
+        },
+        "prompt-enhancer": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Enhance brief development requests by analyzing project context to generate detailed, contextually-aware requirements",
+            "promptTriggers": {
+                "keywords": [
+                    "요구사항",
+                    "requirements",
+                    "프로젝트 컨텍스트",
+                    "project context",
+                    "상세화",
+                    "명확하게",
+                    "구체화",
+                    "요청 분석",
+                    "request analysis",
+                    "컨텍스트 분석",
+                    "context analysis",
+                    "개발 요청",
+                    "development request",
+                    "기능 명세",
+                    "specification"
+                ],
+                "intentPatterns": [
+                    "(상세|구체|명확).*?요구사항",
+                    "(analyze|enhance|improve).*?(request|requirement)",
+                    "프로젝트.*?컨텍스트.*?(분석|기반)",
+                    "context.*?aware.*?requirement",
+                    "(간단한|짧은|brief).*?(요청|request).*?(상세|구체|detailed)",
+                    "기능.*?(구현|개발).*?요구사항"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "**/requirements/**/*.md",
+                    "**/specs/**/*.md",
+                    "**/REQUIREMENTS.md",
+                    "**/PROJECT.md"
+                ],
+                "contentPatterns": [
+                    "## Requirements",
+                    "## 요구사항",
+                    "## Specification"
+                ]
+            }
+        },
+        "agent-workflow-manager": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "critical",
+            "description": "Agent Skills 통합 워크플로우를 자동으로 관리하고 조율",
+            "promptTriggers": {
+                "keywords": [
+                    "워크플로우",
+                    "workflow",
+                    "자동화",
+                    "automation",
+                    "전체 프로세스",
+                    "통합 작업",
+                    "에이전트 체인",
+                    "agent chain"
+                ],
+                "intentPatterns": [
+                    "(전체|통합|자동).*?(워크플로우|프로세스)",
+                    "workflow.*?(manage|start|execute|run)",
+                    "(자동|auto).*?(처리|실행|workflow)"
+                ]
+            }
+        },
+        "agent-workflow-advisor": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "critical",
+            "description": "작업에 최적인 에이전트 패턴 추천",
+            "promptTriggers": {
+                "keywords": [
+                    "어떤 패턴",
+                    "패턴 추천",
+                    "which pattern",
+                    "recommend pattern",
+                    "워크플로우 선택",
+                    "workflow choice",
+                    "워크플로우 추천",
+                    "패턴 선택",
+                    "어떤 워크플로우"
+                ],
+                "intentPatterns": [
+                    "(어떤|which).*?(패턴|pattern|스킬|skill|워크플로우|workflow)",
+                    "(추천|recommend|suggest).*?(패턴|pattern|워크플로우|workflow)",
+                    "(선택|choose|select).*?(워크플로우|workflow|패턴|pattern)",
+                    "워크플로우.*?추천"
+                ]
+            }
+        },
+        "intelligent-task-router": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "작업 분류 및 최적 처리 경로 라우팅",
+            "promptTriggers": {
+                "keywords": [
+                    "라우팅",
+                    "분류",
+                    "routing",
+                    "classify",
+                    "route",
+                    "작업 분류",
+                    "task classification"
+                ],
+                "intentPatterns": [
+                    "(분류|classify|route).*?(작업|task|요청|request)",
+                    "(라우팅|routing).*?(설정|setup|구성|config)",
+                    "(어떤|which).*?(경로|path|라우팅|routing)"
+                ]
+            }
+        },
+        "parallel-task-executor": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "병렬 작업 실행 및 결과 집계",
+            "promptTriggers": {
+                "keywords": [
+                    "병렬",
+                    "동시",
+                    "parallel",
+                    "concurrent",
+                    "sectioning",
+                    "voting",
+                    "멀티태스킹",
+                    "multitasking"
+                ],
+                "intentPatterns": [
+                    "(병렬|parallel|동시).*?(실행|처리|작업|execution)",
+                    "(sectioning|voting).*?mode",
+                    "(여러|multiple).*?(동시|concurrent|parallel)"
+                ]
+            }
+        },
+        "dynamic-task-orchestrator": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "복잡한 프로젝트의 동적 분해 및 워커 조율",
+            "promptTriggers": {
+                "keywords": [
+                    "복잡한",
+                    "대규모",
+                    "orchestrate",
+                    "complex project",
+                    "전체 스택",
+                    "full stack",
+                    "멀티 에이전트",
+                    "multi agent"
+                ],
+                "intentPatterns": [
+                    "(복잡한|complex).*?(프로젝트|시스템|작업|project)",
+                    "(전체|full).*?(스택|stack)",
+                    "(대규모|large).*?(프로젝트|작업|project)",
+                    "orchestrat.*?(task|worker|agent)"
+                ]
+            }
+        },
+        "sequential-task-processor": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "순차 작업 처리 및 검증 게이트 관리",
+            "promptTriggers": {
+                "keywords": [
+                    "순차",
+                    "단계별",
+                    "sequential",
+                    "step by step",
+                    "prompt chaining",
+                    "단계적",
+                    "체인"
+                ],
+                "intentPatterns": [
+                    "(순차|sequential|단계별|step).*?(처리|실행|작업)",
+                    "(gate|검증|validation).*?between",
+                    "(체인|chain).*?(작업|task|프롬프트|prompt)"
+                ]
+            }
+        },
+        "iterative-quality-enhancer": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "품질 평가 및 반복 개선 루프",
+            "promptTriggers": {
+                "keywords": [
+                    "품질",
+                    "최적화",
+                    "개선",
+                    "quality",
+                    "optimize",
+                    "enhance",
+                    "evaluate",
+                    "리팩토링",
+                    "refactor"
+                ],
+                "intentPatterns": [
+                    "(품질|quality).*?(평가|검증|improve|enhance)",
+                    "(최적화|optimize|개선|enhance).*?(반복|iterate|코드|code)",
+                    "(리팩토링|refactor).*?(코드|code|품질|quality)",
+                    "(평가|evaluate).*?(품질|quality|성능|performance)"
+                ]
+            }
+        },
+        "dual-ai-loop": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Dual-AI 엔지니어링 루프 (codex, qwen 등)",
+            "promptTriggers": {
+                "keywords": [
+                    "dual ai",
+                    "codex",
+                    "qwen",
+                    "다른 AI",
+                    "AI 협업",
+                    "copilot",
+                    "aider",
+                    "rovo-dev"
+                ],
+                "intentPatterns": [
+                    "(codex|qwen|aider|copilot).*?(사용|협업|loop)",
+                    "(dual|two|다른).*?ai.*?(loop|협업|협력)",
+                    "ai.*?(협업|collaboration|together)"
+                ]
+            }
+        },
+        "reflection-review": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Claude Code 결과를 6개 영역에서 평가하고 성찰 기반 리뷰 생성",
+            "promptTriggers": {
+                "keywords": [
+                    "피드백",
+                    "feedback",
+                    "평가",
+                    "evaluate",
+                    "결과 분석",
+                    "result analysis",
+                    "리뷰",
+                    "review",
+                    "점수",
+                    "score",
+                    "품질 평가",
+                    "quality assessment",
+                    "코드 평가",
+                    "code evaluation",
+                    "구현 평가",
+                    "implementation review",
+                    "테스트 평가",
+                    "test evaluation",
+                    "자기비판",
+                    "self-critique",
+                    "성찰",
+                    "reflection"
+                ],
+                "intentPatterns": [
+                    "(피드백|feedback).*?(생성|제공|분석|generate)",
+                    "(평가|evaluate|assess).*?(결과|result|코드|code)",
+                    "(리뷰|review).*?(결과|코드|구현|implementation)",
+                    "(분석|analyze).*?(결과|품질|quality)",
+                    "(점수|score).*?(평가|매기|calculate)",
+                    "(자기비판|성찰|critique|reflect)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "**/*.ts",
+                    "**/*.tsx",
+                    "**/*.js",
+                    "**/*.jsx",
+                    "**/*.py"
+                ],
+                "pathExclusions": [
+                    "**/node_modules/**",
+                    "**/dist/**",
+                    "**/build/**"
+                ]
+            }
+        },
+        "skill-generator-tool": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "critical",
+            "description": "Unified tool generator that recommends and routes to the optimal Claude Code tool type (Command, Skill, Subagent, Hook)",
+            "promptTriggers": {
+                "keywords": [
+                    "create tool",
+                    "generate tool",
+                    "make tool",
+                    "tool type",
+                    "which tool",
+                    "automate",
+                    "automation",
+                    "extend capabilities",
+                    "create command",
+                    "create skill",
+                    "create subagent",
+                    "create hook",
+                    "create agent",
+                    "tool generator",
+                    "tool creator",
+                    "도구 생성",
+                    "자동화",
+                    "what should I use",
+                    "how do I automate"
+                ],
+                "intentPatterns": [
+                    "(create|make|build|generate).*?(tool|command|skill|subagent|hook|agent)",
+                    "(which|what).*?(tool|type).*?(should|use|best)",
+                    "(automate|automation).*?(create|build|make)",
+                    "(extend|add).*?(capabilities|functionality)",
+                    "(unsure|not sure|don't know).*?(tool|type|which)",
+                    "how.*?(automate|create).*?(workflow|process)",
+                    "(recommend|suggest).*?(tool|type)"
+                ]
+            }
+        },
+        "command-creator": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "슬래시 커맨드 생성 및 관리",
+            "promptTriggers": {
+                "keywords": [
+                    "command",
+                    "slash command",
+                    "커맨드",
+                    "슬래시 커맨드",
+                    "명령어"
+                ],
+                "intentPatterns": [
+                    "(create|make|add).*?(command|커맨드|명령어)",
+                    "(슬래시|slash).*?(커맨드|command)"
+                ]
+            }
+        },
+        "hooks-creator": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "훅 생성 및 이벤트 자동화",
+            "promptTriggers": {
+                "keywords": [
+                    "hook",
+                    "훅",
+                    "event hook",
+                    "이벤트 훅",
+                    "자동화 훅"
+                ],
+                "intentPatterns": [
+                    "(create|make|add).*?(hook|훅)",
+                    "(event|이벤트).*?(hook|훅|자동화)"
+                ]
+            }
+        },
+        "subagent-creator": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "서브에이전트 생성 및 관리",
+            "promptTriggers": {
+                "keywords": [
+                    "subagent",
+                    "agent",
+                    "서브에이전트",
+                    "에이전트"
+                ],
+                "intentPatterns": [
+                    "(create|make|add).*?(subagent|agent|에이전트)",
+                    "(서브|sub).*?(에이전트|agent)"
+                ]
+            }
+        }
+    },
+    "notes": {
+        "enforcement_types": {
+            "suggest": "Skill suggestion appears but doesn't block execution",
+            "block": "Requires skill to be used before proceeding (guardrail)",
+            "warn": "Shows warning but allows proceeding"
+        },
+        "priority_levels": {
+            "critical": "Highest - Always trigger when matched",
+            "high": "Important - Trigger for most matches",
+            "medium": "Moderate - Trigger for clear matches",
+            "low": "Optional - Trigger only for explicit matches"
+        },
+        "customization": {
+            "pathPatterns": "Adjust to match your project structure (blog-api, auth-service, etc.)",
+            "keywords": "Add domain-specific terms relevant to your project",
+            "intentPatterns": "Use regex for flexible user intent matching"
+        }
+    }
+}

@@ -16,24 +16,23 @@ This is a Claude Code skills and hooks collection - a toolkit for extending Clau
 
 ### Directory Structure
 ```
-.claude/
-├── skills/           # 23+ skills (SKILL.md + bundled resources)
-├── commands/         # Slash commands (.md files)
-├── hooks/            # Event hooks (shell scripts)
-└── settings.local.json  # Hook configuration
-
-# Plugin structure (root level)
+# Claude Code Plugin Standard Structure
+skills/               # 23+ skills (SKILL.md + bundled resources)
+commands/             # Slash commands (.md files)
+hooks/                # Event hooks (shell scripts + hooks.json)
+agents/               # Subagent definitions
+scripts/              # Installation and utility scripts
 .claude-plugin/       # Plugin metadata
 ├── plugin.json       # Plugin configuration
 └── marketplace.json  # Marketplace listing
-agents/               # Subagent definitions
-scripts/              # Installation and utility scripts
-hooks/hooks.json      # Plugin hook configuration
+settings.local.json   # Local hook configuration and permissions
 ```
 
 ### Key Configuration Files
-- `.claude/skills/skill-rules.json` - Skill auto-activation triggers (keywords, intent patterns)
-- `.claude/settings.local.json` - Hook registration and permissions
+- `skills/skill-rules.json` - Skill auto-activation triggers (keywords, intent patterns)
+- `settings.local.json` - Local hook configuration and permissions
+- `hooks/hooks.json` - Plugin hook configuration
+- `.claude-plugin/plugin.json` - Plugin metadata and manifest
 
 ### Skill Categories
 
@@ -63,7 +62,7 @@ node scripts/install-skills.js --dry-run  # Preview without changes
 
 ### Intent Analysis (for skill-generator-tool)
 ```bash
-python3 .claude/skills/skill-generator-tool/scripts/analyze_intent.py "user request"
+python3 skills/skill-generator-tool/scripts/analyze_intent.py "user request"
 ```
 
 ### Workflow Commands
@@ -173,7 +172,7 @@ Skills use three-level loading:
   - 5개 CLI 지원 (codex ✅, qwen ✅, copilot, rovo-dev, aider)
   - codex와 qwen은 실제 테스트 검증됨
   - 역할 교체 가능 (구현자/리뷰어)
-  - CLI 어댑터 모듈화 (.claude/skills/cli-adapters/)
+  - CLI 어댑터 모듈화 (skills/cli-adapters/)
   - cli-updater로 자동 버전 관리
 
 #### 6. 프롬프트 도구 (2개)
@@ -190,13 +189,13 @@ Skills use three-level loading:
 
 ### 훅 현황 (활성화 3개)
 
-**위치**: `.claude/hooks/`
-**설정 파일**: `.claude/settings.local.json`
+**위치**: `hooks/`
+**설정 파일**: `settings.local.json`
 
 #### UserPromptSubmit 훅 (2개)
 1. **skill-activation-prompt.ts**:
    - 사용자 프롬프트 분석 후 적합한 스킬 자동 제안
-   - `.claude/skills/skill-rules.json` 기반 키워드/인텐트 매칭
+   - `skills/skill-rules.json` 기반 키워드/인텐트 매칭
    - 우선순위별 스킬 추천 (Critical → High → Medium → Low)
 
 2. **meta-prompt-logger.js**:
@@ -345,7 +344,7 @@ Skills use three-level loading:
 
 #### 2.1 슬래시 커맨드 추가
 ```markdown
-# .claude/commands/auto-workflow.md
+# commands/auto-workflow.md
 ---
 description: 작업을 자동으로 분석하고 최적 워크플로우 실행
 allowed-tools: Task
@@ -514,13 +513,20 @@ allowed-tools: Task
 
 ---
 
-**Last Updated**: 2025-11-19
-**Version**: 1.3.0
+**Last Updated**: 2025-11-20
+**Version**: 1.4.0
 **Maintainer**: @inchan
 
 ---
 
 ## 📝 변경 이력
+
+### v1.4.0 (2025-11-20)
+- ✅ **플러그인 구조 수정**: Claude Code 플러그인 표준 구조로 완전 마이그레이션
+  - `.claude/` 디렉토리 제거
+  - `skills/`, `commands/`, `hooks/` 모두 루트 레벨로 이동
+  - 모든 설정 파일 경로 업데이트 (settings.local.json, hooks/hooks.json)
+- ✅ **문서 업데이트**: CLAUDE.md의 모든 경로 참조 수정
 
 ### v1.3.0 (2025-11-20)
 - ✅ **원격 저장소 머지**: 플러그인 구조, README, agents 디렉토리 통합
@@ -537,18 +543,19 @@ allowed-tools: Task
 - ✅ **문서 현행화**: 실제 상태와 문서 동기화
 
 ### v1.2.0 (2025-11-17)
-- ✅ **디렉토리 구조 재편**: Claude Code 표준 구조로 마이그레이션
-  - `skills/` → `.claude/skills/`
-  - `hooks/` → `.claude/hooks/`
-  - `.claude/commands/` 디렉토리 생성
-- ✅ **훅 설정 등록**: `.claude/settings.local.json`에 훅 구성 추가
+- ✅ **디렉토리 구조 재편**: Claude Code 플러그인 표준 구조로 마이그레이션
+  - `.claude/skills/` → `skills/` (루트 레벨로 이동)
+  - `.claude/commands/` → `commands/` (루트 레벨로 이동)
+  - `.claude/hooks/` → `hooks/` (루트 레벨로 병합)
+  - `.claude/settings.local.json` → `settings.local.json` (루트 레벨로 이동)
+- ✅ **훅 설정 등록**: `settings.local.json` 및 `hooks/hooks.json`에 훅 구성 추가
 
 ### v1.1.0 (2025-11-17)
 - ✅ AI 연동 스킬 통합: codex-claude-loop, qwen-claude-loop, codex → dual-ai-loop
 - ✅ 문서 구조 개편: 루트 파일을 docs/ 하위로 이동
 - ✅ 스킬 총 개수 업데이트: 19개 → 22개
 - ✅ 새로운 스킬 추가: agent-workflow-advisor, agent-workflow-orchestrator, cli-updater, subagent-creator
-- ✅ CLI 어댑터 모듈화 (.claude/skills/cli-adapters/)
+- ✅ CLI 어댑터 모듈화 (skills/cli-adapters/)
 
 ### v1.0.0 (2025-11-14)
 - 초기 통합 관리 가이드 작성

@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/skill-activation-prompt.js"
+            "command": "npx tsx ${CLAUDE_PLUGIN_ROOT}/hooks/skill-activation-prompt.ts"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/post-tool-use-tracker.sh"
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/post-tool-use-tracker.sh"
           }
         ]
       }
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/stop-hook-lint-and-translate.sh"
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/stop-hook-lint-and-translate.sh"
           }
         ]
       }

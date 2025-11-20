@@ -1,0 +1,91 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(done)",
+      "Bash(find:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Skill(prompt-enhancer)",
+      "Bash(sort:*)",
+      "Bash(tar:*)",
+      "Bash(tree:*)",
+      "Bash(python3:*)",
+      "Bash(xargs:*)",
+      "Skill(reflection-review)",
+      "Bash(chmod:*)",
+      "Bash(node scripts/validate-skill-rules.js:*)",
+      "Bash(node:*)",
+      "Bash(printf:*)",
+      "Bash(cat:*)",
+      "Bash(npx tsx:*)",
+      "Bash(SKIP_PROMPT_ENHANCE=0 npx tsx:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(while read f)",
+      "Bash(do if git status --porcelain)",
+      "Bash(then echo \"충돌 가능: $f\")",
+      "Bash(fi)",
+      "Bash(for f in \"CLAUDE.md\" \"skills/skill-rules.json\")",
+      "Bash(do echo \"--- $f ---\")",
+      "Bash(git fsck:*)",
+      "Bash(git stash:*)",
+      "Bash(while read skill)",
+      "Bash(do if [ -d \"skills/$skill\" ])",
+      "Bash(then echo \"✅ $skill\")",
+      "Bash(else echo \"❌ $skill (디렉토리 없음)\")",
+      "Bash(do if grep -q '$(dirname $f)' CLAUDE.md)",
+      "Bash(then echo '⚠️  $f')",
+      "Bash(npx eslint:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "enabledMcpjsonServers": [
+    "Context7",
+    "Puppeteer",
+    "Sequential-Thinking"
+  ],
+  "disabledMcpjsonServers": [
+    "basic-memory",
+    "obsidian"
+  ],
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx tsx hooks/skill-activation-prompt.ts"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/post-tool-use-tracker.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/stop-hook-lint-and-translate.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
