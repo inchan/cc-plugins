@@ -2,103 +2,303 @@
 
 Claude Code용 스킬 및 훅 컬렉션 플러그인입니다.
 
+---
+
+## 아키텍처 개요
+
+```mermaid
+flowchart TB
+    subgraph Input["입력"]
+        UP[User Prompt]
+    end
+
+    subgraph Hooks["훅 시스템"]
+        UPS[UserPromptSubmit<br/>skill-activation-prompt]
+        PTU[PostToolUse<br/>post-tool-use-tracker]
+        SH[Stop<br/>lint-and-translate]
+    end
+
+    subgraph Router["라우팅"]
+        SGT[skill-generator-tool]
+        ITR[intelligent-task-router]
+    end
+
+    subgraph Workflow["워크플로우 엔진"]
+        AWM[agent-workflow-manager]
+        STP[sequential-task-processor]
+        PTE[parallel-task-executor]
+        DTO[dynamic-task-orchestrator]
+    end
+
+    subgraph Agents["서브에이전트"]
+        CR[code-reviewer]
+        AR[architect]
+        WO[workflow-orchestrator]
+    end
+
+    subgraph Quality["품질 관리"]
+        IQE[iterative-quality-enhancer]
+        CF[code-feedback]
+    end
+
+    subgraph Creators["도구 생성"]
+        CC[command-creator]
+        SC[skill-creator]
+        SAC[subagent-creator]
+        HC[hooks-creator]
+    end
+
+    subgraph Guidelines["개발 가이드"]
+        FDG[frontend-dev-guidelines]
+        BDG[backend-dev-guidelines]
+        ET[error-tracking]
+    end
+
+    UP --> UPS
+    UPS --> |스킬 제안| SGT
+    SGT --> |도구 생성| Creators
+    SGT --> |작업 처리| ITR
+
+    ITR --> |복잡도 분석| AWM
+    AWM --> |< 0.3| STP
+    AWM --> |0.3-0.7| PTE
+    AWM --> |> 0.7| DTO
+
+    STP --> Agents
+    PTE --> Agents
+    DTO --> Agents
+
+    Agents --> IQE
+    IQE --> CF
+
+    Creators --> |가이드 참조| Guidelines
+    Agents --> |가이드 참조| Guidelines
+
+    PTU --> |파일 추적| Quality
+    SH --> |최종 검증| Quality
+```
+
+### 연결 흐름
+
+1. **입력 처리**
+   User Prompt → UserPromptSubmit 훅
+
+2. **라우팅**
+   skill-generator-tool / intelligent-task-router
+
+3. **실행**
+   복잡도별 워크플로우 선택 → 에이전트 실행
+
+4. **품질 검증**
+   iterative-quality-enhancer → code-feedback
+
+---
+
 ## 설치
 
 ```bash
 # 마켓플레이스 추가
 /plugin marketplace add inchan/cc-skills
 
-# 플러그인 설치 및 활성화
+# 설치 및 활성화
 /plugin install cc-skills@inchan-cc-skills
 /plugin enable cc-skills@inchan-cc-skills
 ```
 
-## 스킬 상세
+---
 
-### 워크플로우 관리
+## 스킬 목록
 
-| 스킬 | 요약 | 작동 방식 |
-|------|------|-----------|
-| `agent-workflow-manager` | 전체 워크플로우 자동 관리 | 작업 복잡도를 분석하여 Router → Sequential/Parallel/Orchestrator → Evaluator를 자동 연결 |
-| `agent-workflow-advisor` | 패턴 추천 어드바이저 | 작업을 분석하고 5가지 패턴(Router, Sequential, Parallel, Orchestrator, Evaluator) 중 최적 패턴 제안 |
-| `agent-workflow-orchestrator` | 고급 오케스트레이션 | 다중 에이전트를 조율하여 복잡한 작업 흐름을 자동으로 관리 |
-| `intelligent-task-router` | 작업 분류 및 라우팅 | 8개 카테고리(bug_fix, feature_development 등)로 분류 후 적합한 처리 경로로 라우팅 |
-| `parallel-task-executor` | 병렬 작업 실행 | Sectioning(독립 작업 동시 실행) 또는 Voting(다중 접근 방식 평가) 모드로 2-10x 속도 향상 |
-| `dynamic-task-orchestrator` | 복잡한 프로젝트 조율 | 6개 전문 워커(Code Analyzer, System Architect 등)를 동적으로 할당하여 복잡도 0.7+ 작업 처리 |
-| `sequential-task-processor` | 순차 작업 처리 | 의존성이 있는 작업을 단계별로 실행하며 각 단계 결과를 다음 단계에 전달 |
+<details>
+<summary><b>워크플로우 관리</b> (7개)</summary>
 
-### 품질 관리
+**agent-workflow-manager**
+- 전체 워크플로우 자동 관리
+- 복잡도 분석 → Router/Sequential/Parallel/Orchestrator → Evaluator 자동 연결
 
-| 스킬 | 요약 | 작동 방식 |
-|------|------|-----------|
-| `iterative-quality-enhancer` | 품질 평가 및 최적화 | 5개 차원(Functionality, Performance, Code Quality, Security, Documentation) 평가 후 최대 5회 반복 개선 |
-| `code-feedback` | 코드 결과 평가 | 6개 영역(분석, 계획, 구현, 리뷰, 검증, 테스트)에서 점수화하고 P0/P1/P2 우선순위 피드백 생성 |
+**agent-workflow-advisor**
+- 패턴 추천 어드바이저
+- 5가지 패턴 중 최적 패턴 제안
 
-### 개발 가이드
+**agent-workflow-orchestrator**
+- 고급 오케스트레이션
+- 다중 에이전트 조율
 
-| 스킬 | 요약 | 작동 방식 |
-|------|------|-----------|
-| `frontend-dev-guidelines` | React/TypeScript/MUI v7 | Suspense, lazy loading, useSuspenseQuery, TanStack Router 등 최신 패턴과 파일 구조 가이드 제공 |
-| `backend-dev-guidelines` | Node.js/Express/Prisma | 레이어드 아키텍처(routes → controllers → services → repositories), BaseController 패턴, Zod 검증 가이드 |
-| `error-tracking` | Sentry v8 패턴 | 에러 캡처, 성능 모니터링, 크론잡 계측 패턴 제공. 모든 에러는 Sentry로 캡처 필수 |
+**intelligent-task-router**
+- 작업 분류 및 라우팅
+- 8개 카테고리로 분류 후 적합한 경로로 라우팅
 
-### 도구 생성
+**parallel-task-executor**
+- 병렬 작업 실행
+- Sectioning/Voting 모드로 2-10x 속도 향상
 
-| 스킬 | 요약 | 작동 방식 |
-|------|------|-----------|
-| `skill-generator-tool` | 도구 타입 추천 | 사용자 요청을 분석하여 Command/Skill/Subagent/Hook 중 최적 도구 타입 추천 후 전문 생성기로 라우팅 |
-| `command-creator` | 슬래시 커맨드 생성 | frontmatter 메타데이터와 프롬프트 본문을 포함한 .md 파일 생성. 검증 스크립트 포함 |
-| `skill-creator` | 스킬 생성 | SKILL.md와 번들 리소스를 포함한 스킬 디렉토리 생성. 500줄 규칙 준수 |
-| `subagent-creator` | 서브에이전트 생성 | 7개 템플릿(basic, researcher, implementer 등) 기반으로 전문 에이전트 생성 |
-| `hooks-creator` | 훅 생성 | 6개 이벤트(PreToolUse, PostToolUse 등)에 대한 훅 스크립트 생성 |
+**dynamic-task-orchestrator**
+- 복잡한 프로젝트 조율
+- 6개 전문 워커 동적 할당 (복잡도 0.7+)
 
-### AI 연동
+**sequential-task-processor**
+- 순차 작업 처리
+- 의존성 있는 작업 단계별 실행
 
-| 스킬 | 요약 | 작동 방식 |
-|------|------|-----------|
-| `dual-ai-loop` | 외부 AI CLI 협업 | codex, qwen, copilot, rovo-dev, aider와 Claude 간 계획-구현-리뷰 사이클 실행. 역할 교체 가능 |
-| `cli-updater` | CLI 버전 업데이트 | CLI 도구 버전 변경 감지 후 어댑터 스킬 및 문서 자동 업데이트 |
+</details>
 
-### 프롬프트
+<details>
+<summary><b>품질 관리</b> (2개)</summary>
 
-| 스킬 | 요약 | 작동 방식 |
-|------|------|-----------|
-| `meta-prompt-generator` | 구조화된 커맨드 생성 | 간단한 설명을 받아 단계별 병렬 처리가 가능한 슬래시 커맨드 프롬프트 자동 생성 |
-| `meta-prompt-generator-v2` | 프롬프트 생성 v2 | 개선된 프롬프트 생성 알고리즘 적용 |
-| `prompt-enhancer` | 컨텍스트 기반 개선 | 프로젝트 구조, 의존성, 컨벤션, 기존 패턴을 분석하여 프롬프트에 컨텍스트 추가 |
+**iterative-quality-enhancer**
+- 품질 평가 및 최적화
+- 5개 차원 평가, 최대 5회 반복 개선
 
-### 기타
+**code-feedback**
+- 코드 결과 평가
+- 6개 영역 점수화, P0/P1/P2 피드백
 
-| 스킬 | 요약 | 작동 방식 |
-|------|------|-----------|
-| `skill-developer` | 스킬 개발 종합 가이드 | Anthropic 공식 표준에 따른 스킬 구조, YAML frontmatter, 트리거 패턴, 훅 메커니즘 가이드 |
-| `route-tester` | 인증 라우트 테스트 | test-auth-route.js와 mock 인증을 사용한 API 엔드포인트 테스트 패턴 제공 |
-| `web-to-markdown` | 웹페이지 변환 | 웹페이지 URL을 입력받아 마크다운으로 변환 후 로컬 파일로 저장 |
+</details>
+
+<details>
+<summary><b>개발 가이드</b> (3개)</summary>
+
+**frontend-dev-guidelines**
+- React/TypeScript/MUI v7
+- Suspense, lazy loading, TanStack Router
+
+**backend-dev-guidelines**
+- Node.js/Express/Prisma
+- 레이어드 아키텍처, Zod 검증
+
+**error-tracking**
+- Sentry v8 패턴
+- 에러 캡처, 성능 모니터링
+
+</details>
+
+<details>
+<summary><b>도구 생성</b> (5개)</summary>
+
+**skill-generator-tool**
+- 도구 타입 추천
+- Command/Skill/Subagent/Hook 중 최적 타입 선택
+
+**command-creator**
+- 슬래시 커맨드 생성
+- frontmatter + 프롬프트 .md 파일
+
+**skill-creator**
+- 스킬 생성
+- SKILL.md + 번들 리소스, 500줄 규칙
+
+**subagent-creator**
+- 서브에이전트 생성
+- 7개 템플릿 기반
+
+**hooks-creator**
+- 훅 생성
+- 6개 이벤트 지원
+
+</details>
+
+<details>
+<summary><b>AI 연동</b> (2개)</summary>
+
+**dual-ai-loop**
+- 외부 AI CLI 협업
+- codex, qwen, copilot, rovo-dev, aider
+- 계획-구현-리뷰 사이클
+
+**cli-updater**
+- CLI 버전 업데이트
+- 어댑터 스킬 및 문서 자동 업데이트
+
+</details>
+
+<details>
+<summary><b>프롬프트</b> (3개)</summary>
+
+**meta-prompt-generator**
+- 구조화된 커맨드 생성
+- 단계별 병렬 처리 가능한 프롬프트
+
+**meta-prompt-generator-v2**
+- 프롬프트 생성 v2
+- 개선된 알고리즘
+
+**prompt-enhancer**
+- 컨텍스트 기반 개선
+- 프로젝트 구조/패턴 분석
+
+</details>
+
+<details>
+<summary><b>기타</b> (3개)</summary>
+
+**skill-developer**
+- 스킬 개발 종합 가이드
+- Anthropic 공식 표준
+
+**route-tester**
+- 인증 라우트 테스트
+- mock 인증 패턴
+
+**web-to-markdown**
+- 웹페이지 변환
+- URL → 마크다운 파일
+
+</details>
+
+---
 
 ## 에이전트
 
-| 에이전트 | 요약 | 작동 방식 |
-|----------|------|-----------|
-| `code-reviewer` | 코드 품질/보안 리뷰 | OWASP Top 10 보안, SOLID/DRY/KISS 원칙, 성능 최적화 관점에서 코드 검토. Critical → Low 우선순위로 피드백 |
-| `architect` | 시스템 아키텍처 설계 | ADR(Architecture Decision Record) 형식으로 설계 문서화. 트레이드오프 분석 및 대안 평가 포함 |
-| `workflow-orchestrator` | 워크플로우 오케스트레이션 | 작업 복잡도(0.0-1.0) 분석 후 적절한 패턴 선택하여 서브에이전트 실행 조율 |
+**code-reviewer**
+- 코드 품질/보안 리뷰
+- OWASP Top 10, SOLID/DRY/KISS 원칙
+- Critical → Low 우선순위 피드백
+
+**architect**
+- 시스템 아키텍처 설계
+- ADR 형식 문서화
+- 트레이드오프 분석
+
+**workflow-orchestrator**
+- 워크플로우 오케스트레이션
+- 복잡도(0.0-1.0) 분석
+- 서브에이전트 실행 조율
+
+---
 
 ## 훅
 
-| 이벤트 | 스크립트 | 작동 방식 |
-|--------|----------|-----------|
-| UserPromptSubmit | `skill-activation-prompt.js` | skill-rules.json의 키워드/인텐트 패턴과 프롬프트를 매칭하여 적합한 스킬 제안 |
-| PostToolUse | `post-tool-use-tracker.sh` | Edit/Write 도구 사용 후 변경된 파일 추적 및 캐시 관리 |
-| Stop | `stop-hook-lint-and-translate.sh` | 응답 완료 후 린트 실행 및 번역 처리 |
+**UserPromptSubmit**
+- `skill-activation-prompt.js`
+- 키워드/인텐트 매칭 → 스킬 제안
 
-## 워크플로우 선택 가이드
+**PostToolUse**
+- `post-tool-use-tracker.sh`
+- Edit/Write 후 파일 추적
 
-| 복잡도 | 권장 패턴 | 사용 시점 |
-|--------|-----------|-----------|
-| < 0.3 | `sequential-task-processor` | 단순 순차 작업, 50자 미만 프롬프트 |
-| 0.3 - 0.7 | `parallel-task-executor` | 독립적인 다중 작업, "여러", "동시" 키워드 포함 |
-| > 0.7 | `dynamic-task-orchestrator` | 복잡한 시스템, "전체", "아키텍처" 키워드 포함 |
-| 자동 | `agent-workflow-manager` | 복잡도 판단이 어려울 때 자동 분석 |
+**Stop**
+- `stop-hook-lint-and-translate.sh`
+- 린트 실행 및 번역
+
+---
+
+## 워크플로우 선택
+
+**복잡도 < 0.3**
+- `sequential-task-processor`
+- 단순 순차 작업
+
+**복잡도 0.3 - 0.7**
+- `parallel-task-executor`
+- 독립적인 다중 작업
+
+**복잡도 > 0.7**
+- `dynamic-task-orchestrator`
+- 복잡한 시스템 구축
+
+**자동 판단**
+- `agent-workflow-manager`
+- 복잡도 자동 분석
 
 ## 사용법
 
