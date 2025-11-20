@@ -45,85 +45,76 @@ description: 외부 AI CLI(codex, qwen, copilot, rovo-dev, aider)와 Claude의 �
 
 ## 시작하기
 
-### Step 1: CLI 도구 선택
+### Step 1: CLI 자동 감지
 
-사용자에게 질문 (AskUserQuestion):
+사용자에게 질문하지 않고 자동으로 CLI를 감지하여 선택합니다.
 
-```
-어떤 AI CLI 도구를 사용하시겠습니까?
-
-1. codex (기본값) - ✅ 완전 검증됨, 자동화 지원 (exec 모드)
-2. qwen - ✅ 완전 검증됨, 자동화 지원 (-p 플래그)
-3. aider - ⚠️ 설치 복잡 (의존성 버전 엄격)
-4. rovo-dev - ❌ 미테스트 (ACLI 서브커맨드)
-5. copilot - ❌ 미테스트
-
-권장: codex (기본값) 또는 qwen (자동화 검증됨)
-주의: aider는 의존성 충돌 가능성 높음
-```
-
-### Step 2: CLI 실행 가능 여부 확인 (필수!)
-
-⚠️ **중요**: **설치 + 인증** 두 조건 모두 충족되어야 실행 가능합니다.
+**우선순위:**
+1. codex (설치 + 인증 확인)
+2. qwen (설치 + 인증 확인)
+3. aider (설치 + 인증 확인)
 
 ```bash
-# 1. 설치 여부 확인
-which <cli_name>
-# ✅ 경로 출력 → 설치됨
-# ❌ 출력 없음 → 미설치 (설치 필요)
-
-# 2. 인증/로그인 상태 확인 (CLI별 다름)
-
-# codex:
-codex login --status
-# ✅ "Logged in as..." → 인증됨
-# ❌ "Not logged in" → 미인증 (codex login 필요)
-
-# qwen:
-qwen -p "test" 2>&1 | head -3
-# ✅ AI 응답 → 인증됨
-# ❌ "Please set an Auth method" → 미인증 (qwen 실행 후 Sign in)
-
-# aider:
-echo $OPENAI_API_KEY  # 또는 ANTHROPIC_API_KEY
-# ✅ 값 있음 → 키 설정됨
-# ❌ 빈 값 → export OPENAI_API_KEY="..." 필요
+# 자동 감지 로직
+for cli in codex qwen aider; do
+    if command -v $cli &> /dev/null; then
+        # 인증 확인
+        case $cli in
+            codex)
+                if codex login --status 2>&1 | grep -q "Logged in"; then
+                    SELECTED_CLI="codex"
+                    break
+                fi
+                ;;
+            qwen)
+                if ! qwen -p "test" 2>&1 | grep -q "Please set an Auth"; then
+                    SELECTED_CLI="qwen"
+                    break
+                fi
+                ;;
+            aider)
+                if [ -n "$OPENAI_API_KEY" ] || [ -n "$ANTHROPIC_API_KEY" ]; then
+                    SELECTED_CLI="aider"
+                    break
+                fi
+                ;;
+        esac
+    fi
+done
 ```
 
-**상태별 처리:**
+### Step 2: CLI 없음 처리 (실패 종료)
 
-| 설치 | 인증 | 결과 | 조치 |
-|------|------|------|------|
-| ✅ | ✅ | **실행 가능** | 루프 진행 |
-| ✅ | ❌ | **실행 불가** | 인증 가이드 안내 후 대기 |
-| ❌ | - | **실행 불가** | 설치 가이드 안내 후 대기 |
-
-**실패 시 대안:**
-1. 사용자가 인증/설치 완료할 때까지 대기
-2. 다른 CLI 선택
-3. Claude가 직접 구현 (외부 AI 없이)
-
-### Step 3: 역할 설정
-
-사용자에게 질문 (AskUserQuestion):
+사용 가능한 CLI가 없으면 **즉시 실패로 종료**합니다.
 
 ```
-역할을 어떻게 설정하시겠습니까?
+❌ dual-ai-loop 실행 실패
 
-A. Claude = 계획/리뷰, 외부 AI = 구현 (기본값)
-   → Claude가 설계하고, 외부 AI가 코드를 작성
+원인: 사용 가능한 CLI가 없습니다.
+- codex: 미설치 또는 미인증
+- qwen: 미설치 또는 미인증
+- aider: 미설치 또는 미인증
 
-B. Claude = 구현, 외부 AI = 검증/리뷰
-   → Claude가 코드를 작성하고, 외부 AI가 검증
+dual-ai-loop를 사용하려면 최소 하나의 CLI가 필요합니다.
 ```
 
-### Step 4: 반복 횟수 설정
+**중요:**
+- 설치 안내를 제공하지 않습니다
+- 다른 CLI 선택을 묻지 않습니다
+- Claude 직접 구현으로 전환하지 않습니다
+- 즉시 실패로 종료합니다
 
-사용자에게 질문 (AskUserQuestion):
+### Step 3: 기본 설정 (자동 적용)
 
-```
-최대 반복 횟수를 설정하세요 (기본값: 3):
-```
+사용자에게 질문하지 않고 기본값을 사용합니다.
+
+| 설정 | 기본값 | 설명 |
+|------|--------|------|
+| **역할** | Mode A | Claude = 계획/리뷰, 외부 AI = 구현 |
+| **반복 횟수** | 3회 | 최대 3번 반복 후 종료 |
+| **CLI** | 자동 감지 | 우선순위에 따라 선택 |
+
+**질문 없이 바로 루프를 시작합니다.**
 
 ## 루프 실행
 
@@ -328,41 +319,47 @@ Task 도구로 cli-updater 서브에이전트 실행:
 
 ## 에러 처리
 
-### CLI 미설치
+### CLI 없음 (실패 종료)
+
+사용 가능한 CLI가 없으면 즉시 실패로 종료합니다.
 
 ```
-"선택하신 {cli_name} CLI가 설치되어 있지 않습니다.
+❌ dual-ai-loop 실행 실패
 
-설치 방법:
-[어댑터 스킬의 설치 가이드 참조]
+원인: 사용 가능한 CLI가 없습니다.
+감지된 CLI: 없음
 
-다른 CLI를 선택하시겠습니까?"
+dual-ai-loop를 사용하려면 최소 하나의 CLI가 필요합니다.
 ```
+
+**주의:** 설치 안내나 대안을 제시하지 않습니다.
 
 ### CLI 실행 실패
 
 ```
-"{cli_name} 실행 중 오류가 발생했습니다.
+❌ {cli_name} 실행 중 오류가 발생했습니다.
 
 오류: [에러 메시지]
 
-선택 가능한 조치:
-1. 재시도
-2. 다른 CLI로 전환
-3. Claude가 직접 구현/리뷰
+dual-ai-loop를 종료합니다.
 ```
+
+**주의:** 재시도나 다른 CLI 전환을 제안하지 않습니다.
 
 ### 버전 불일치
 
+버전 불일치가 감지되면 경고만 출력하고 계속 진행합니다.
+
 ```
-"{cli_name} 버전이 업데이트되었습니다.
+⚠️ {cli_name} 버전 불일치
 현재: {current_version}
 스킬 지원: {supported_version}
 
-스킬을 업데이트하시겠습니까?
-→ 예: cli-updater 실행
-→ 아니오: 현재 상태로 진행 (문제 발생 가능)"
+경고: 일부 기능이 예상대로 작동하지 않을 수 있습니다.
+루프를 계속 진행합니다.
 ```
+
+**주의:** 업데이트 여부를 묻지 않습니다.
 
 ## 최종 결과 보고
 
@@ -392,16 +389,17 @@ Task 도구로 cli-updater 서브에이전트 실행:
 
 ## 사용 예시
 
-### 예시 1: 로그인 기능 구현
+### 예시 1: 로그인 기능 구현 (성공)
 
 ```
 사용자: "로그인 기능 구현해줘"
 
 Claude:
-1. CLI 선택? → codex (기본값)
-2. CLI 상태: ✅ 설치됨, v2.0.0
-3. 역할: Mode A (Claude 계획, codex 구현)
-4. 반복: 3회
+[자동 감지]
+→ codex: ✅ 설치됨, ✅ 인증됨
+→ 선택된 CLI: codex
+→ 역할: Mode A (기본값)
+→ 반복: 3회 (기본값)
 
 [루프 시작]
 → Claude가 JWT 기반 인증 계획 수립
@@ -412,33 +410,37 @@ Claude:
 [완료]
 ```
 
-### 예시 2: 코드 리팩토링
+### 예시 2: CLI 없음 (실패)
 
 ```
 사용자: "이 함수 리팩토링해줘"
 
 Claude:
-1. CLI 선택? → rovo-dev
-2. 역할: Mode B (Claude 구현, rovo-dev 검증)
-3. 반복: 2회
+[자동 감지]
+→ codex: ❌ 미설치
+→ qwen: ❌ 미인증
+→ aider: ❌ 미설치
 
-[루프 시작]
-→ Claude가 리팩토링 수행
-→ rovo-dev가 검증: "성능 이슈 발견"
-→ Claude가 최적화
-→ rovo-dev 승인
-[완료]
+❌ dual-ai-loop 실행 실패
+
+원인: 사용 가능한 CLI가 없습니다.
+- codex: 미설치 또는 미인증
+- qwen: 미설치 또는 미인증
+- aider: 미설치 또는 미인증
+
+dual-ai-loop를 사용하려면 최소 하나의 CLI가 필요합니다.
 ```
 
 ## 제한사항
 
-1. **CLI 도구 의존성**
-   - 해당 CLI가 설치되어 있어야 함
-   - 일부 CLI는 구독/라이선스 필요
+1. **CLI 도구 필수**
+   - 최소 하나의 CLI가 설치 + 인증되어 있어야 함
+   - CLI가 없으면 실패로 종료 (대안 없음)
 
-2. **자동화의 한계**
-   - 완전 자동이 아닌 반자동 워크플로우
-   - 사용자 확인이 필요한 단계 있음
+2. **완전 자동화**
+   - 사용자에게 질문하지 않음
+   - 기본값으로 자동 실행 (Mode A, 3회 반복)
+   - 실패 시 즉시 종료
 
 3. **품질 보장 불가**
    - 외부 AI의 결과물 품질이 다양함
@@ -446,7 +448,7 @@ Claude:
 
 4. **버전 호환성**
    - CLI 버전 변경 시 스킬 업데이트 필요
-   - 자동 업데이트는 제안만 할 뿐 강제하지 않음
+   - 버전 불일치 시 경고만 출력하고 계속 진행
 
 ## 관련 스킬
 

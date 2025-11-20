@@ -28,7 +28,7 @@ fi
 
 cd "$GIT_ROOT"
 
-# package.json이 있는지 확인 (OfficeMail 프로젝트 확인)
+# package.json이 있는지 확인
 if [ ! -f "package.json" ]; then
   exit 0
 fi
@@ -94,6 +94,12 @@ for i in "${!AVAILABLE_TASKS[@]}"; do
 done
 
 echo ""
+
+# 대화형 모드가 아니면 건너뛰기 (global hook에서 실행 시)
+if [ ! -t 0 ]; then
+  exit 0
+fi
+
 echo -e "${YELLOW}실행할 작업을 선택하세요:${NC}"
 echo -e "  - 숫자를 입력 (예: ${GREEN}1,3${NC})"
 echo -e "  - ${GREEN}all${NC}: 모든 작업 실행"
@@ -275,10 +281,10 @@ if [ $HAS_ERROR -eq 1 ]; then
   for task in "${ERROR_TASKS[@]}"; do
     case $task in
       "eslint")
-        echo -e "  ${GREEN}yarn eslint --fix [파일명]${NC}"
+        echo -e "  ${GREEN}npx eslint --fix [파일명]${NC}"
         ;;
       "stylelint")
-        echo -e "  ${GREEN}yarn stylelint --fix [파일명]${NC}"
+        echo -e "  ${GREEN}npx stylelint --fix [파일명]${NC}"
         ;;
     esac
   done
@@ -318,7 +324,7 @@ if [[ " ${SELECTED_TASKS[@]} " =~ " i18n " ]]; then
     
     echo ""
     echo -e "${YELLOW}💡 번역 텍스트를 업데이트하려면:${NC}"
-    echo -e "  ${GREEN}yarn i18n-extract${NC}"
+    echo -e "  ${GREEN}npm run i18n-extract${NC} (또는 프로젝트의 i18n 스크립트)"
     echo ""
   fi
 fi

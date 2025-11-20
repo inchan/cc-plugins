@@ -419,8 +419,45 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for complete debugging guide.
 
 ---
 
+## Utility Scripts
+
+This skill includes helper scripts in the `scripts/` directory:
+
+### init_skill.py
+**Purpose**: Initialize a new skill with proper structure
+```bash
+python scripts/init_skill.py <skill-name>
+```
+Creates a new skill directory with:
+- SKILL.md template
+- Proper YAML frontmatter
+- Basic directory structure
+
+### package_skill.py
+**Purpose**: Package a skill for distribution
+```bash
+python scripts/package_skill.py <skill-path>
+```
+Validates and packages a skill:
+- Checks required files
+- Validates YAML frontmatter
+- Creates distributable package
+
+### quick_validate.py
+**Purpose**: Validate skill structure and syntax
+```bash
+python scripts/quick_validate.py <skill-path>
+```
+Performs validation checks:
+- YAML frontmatter syntax
+- Required fields present
+- File structure compliance
+
+---
+
 **Skill Status**: COMPLETE - Restructured following Anthropic best practices ✅
 **Line Count**: < 500 (following 500-line rule) ✅
 **Progressive Disclosure**: Reference files for detailed information ✅
+**Scripts**: Includes utility scripts from skill-creator ✅
 
 **Next**: Create more skills, refine patterns based on usage

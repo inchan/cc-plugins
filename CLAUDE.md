@@ -17,11 +17,18 @@ This is a Claude Code skills and hooks collection - a toolkit for extending Clau
 ### Directory Structure
 ```
 .claude/
-├── skills/           # 22+ skills (SKILL.md + bundled resources)
+├── skills/           # 23+ skills (SKILL.md + bundled resources)
 ├── commands/         # Slash commands (.md files)
-├── agents/           # Subagents (.md files)
 ├── hooks/            # Event hooks (shell scripts)
 └── settings.local.json  # Hook configuration
+
+# Plugin structure (root level)
+.claude-plugin/       # Plugin metadata
+├── plugin.json       # Plugin configuration
+└── marketplace.json  # Marketplace listing
+agents/               # Subagent definitions
+scripts/              # Installation and utility scripts
+hooks/hooks.json      # Plugin hook configuration
 ```
 
 ### Key Configuration Files
@@ -45,36 +52,27 @@ This is a Claude Code skills and hooks collection - a toolkit for extending Clau
 
 ## Development Commands
 
-### Skill Initialization
+### Installation
 ```bash
-# Create new skill
-python3 .claude/skills/skill-creator/scripts/init_skill.py <name> --path .claude/skills
-
-# Create new command
-python3 .claude/skills/command-creator/scripts/init_command.py <name> "description" --location project
-
-# Create new subagent
-python3 .claude/skills/subagent-creator/scripts/init_subagent.py <name> "description" --template <template>
-
-# Create new hook
-python3 .claude/skills/hooks-creator/scripts/init_hook.py <name> --event <event> --path .claude/hooks
-```
-
-### Validation
-```bash
-# Validate command
-python3 .claude/skills/command-creator/scripts/validate_command.py .claude/commands/<name>.md
-
-# Validate subagent
-python3 .claude/skills/subagent-creator/scripts/validate_subagent.py .claude/agents/<name>.md
-
-# Package skill for distribution
-python3 .claude/skills/skill-creator/scripts/package_skill.py .claude/skills/<name>
+# Install skills to global (~/.claude) or workspace (./.claude)
+node scripts/install-skills.js
+node scripts/install-skills.js --target global
+node scripts/install-skills.js --target workspace
+node scripts/install-skills.js --dry-run  # Preview without changes
 ```
 
 ### Intent Analysis (for skill-generator-tool)
 ```bash
 python3 .claude/skills/skill-generator-tool/scripts/analyze_intent.py "user request"
+```
+
+### Workflow Commands
+```bash
+# Use slash commands for workflows
+/auto-workflow <작업 설명>      # Auto-analyze and execute optimal workflow
+/workflow-simple <작업 설명>    # Sequential task processing
+/workflow-parallel <작업 설명>  # Parallel task execution
+/workflow-complex <프로젝트 설명> # Complex project orchestration
 ```
 
 ## Important Patterns
@@ -104,8 +102,8 @@ Skills use three-level loading:
 
 # Claude Code Skills & Hooks - 통합 관리 가이드
 
-**최종 업데이트**: 2025-11-17
-**버전**: 1.2.0
+**최종 업데이트**: 2025-11-19
+**버전**: 1.3.0
 
 ---
 
@@ -124,7 +122,7 @@ Skills use three-level loading:
 
 ## 🔍 현재 상태 분석
 
-### 스킬 현황 (총 22개)
+### 스킬 현황 (총 23개)
 
 #### 1. 워크플로우 관리 (7개)
 - **agent-workflow-manager**: 전체 워크플로우 자동 관리 조율자
@@ -165,10 +163,9 @@ Skills use three-level loading:
 - **backend-dev-guidelines**: Node.js/Express/TypeScript/Prisma 가이드
 - **error-tracking**: Sentry v8 에러 추적 패턴
 
-#### 4. 도구 생성 (4개)
+#### 4. 도구 생성 (3개)
 - **command-creator**: 슬래시 커맨드 생성 및 관리
 - **hooks-creator**: 훅 생성 가이드
-- **skill-creator**: 스킬 생성 가이드
 - **subagent-creator**: 서브에이전트 생성 가이드
 
 #### 5. AI 연동 (1개) ✅ 통합 완료
@@ -180,11 +177,13 @@ Skills use three-level loading:
   - cli-updater로 자동 버전 관리
 
 #### 6. 프롬프트 도구 (2개)
-- **meta-prompt-generator**: 구조화된 커스텀 슬래시 커맨드 생성
+- **meta-prompt-generator-v2**: 슬래시 커맨드용 프롬프트 생성 (간결하고 실용적)
 - **prompt-enhancer**: 프로젝트 컨텍스트 기반 프롬프트 개선
 
-#### 7. 기타 도구 (4개)
-- **skill-developer**: 스킬 개발 종합 가이드 (Anthropic 공식 표준 준수)
+#### 7. 기타 도구 (6개)
+- **skill-developer**: 스킬 개발 종합 가이드 (Anthropic 공식 표준 준수 + 유틸리티 스크립트 포함)
+- **skill-generator-tool**: 도구 유형 분석 및 최적 생성기 추천
+- **reflection-review**: Claude Code 결과를 6개 영역에서 평가 및 성찰 기반 리뷰
 - **route-tester**: 인증 라우트 테스트
 - **web-to-markdown**: 웹페이지 마크다운 변환
 - **cli-updater**: CLI 도구 자동 버전 업데이트
@@ -212,51 +211,63 @@ Skills use three-level loading:
 
 ### Skill Rules 등록 현황
 
-**등록된 스킬** (7개):
+**등록된 스킬** (20개) ✅ 대폭 개선됨:
 - skill-developer
-- meta-prompt-generator
+- skill-generator-tool ✅ (신규)
+- meta-prompt-generator-v2 ✅
 - backend-dev-guidelines
 - frontend-dev-guidelines
 - route-tester
 - error-tracking
+- prompt-enhancer ✅
+- reflection-review ✅ (신규)
+- agent-workflow-manager ✅
+- agent-workflow-advisor ✅
+- intelligent-task-router ✅
+- parallel-task-executor ✅
+- dynamic-task-orchestrator ✅
+- sequential-task-processor ✅
+- iterative-quality-enhancer ✅
+- dual-ai-loop ✅
+- command-creator ✅ (신규)
+- hooks-creator ✅ (신규)
+- subagent-creator ✅ (신규)
 
-**미등록 스킬** (15개):
-- agent-workflow-manager ⚠️
-- agent-workflow-advisor ⚠️
-- agent-workflow-orchestrator ⚠️
-- intelligent-task-router ⚠️
-- parallel-task-executor ⚠️
-- dynamic-task-orchestrator ⚠️
-- sequential-task-processor ⚠️
-- iterative-quality-enhancer ⚠️
-- command-creator
-- hooks-creator
-- skill-creator
-- subagent-creator
-- dual-ai-loop
+**미등록 스킬** (3개):
+- agent-workflow-orchestrator
 - cli-updater
-- prompt-enhancer
+- web-to-markdown
 
 ---
 
-## 🎯 문제점 분석
+## 🎯 해결된 문제 및 현재 상태
 
-### 1. 스킬 등록 불완전
-- **핵심 워크플로우 스킬이 미등록**: agent-workflow-manager, router, parallel-executor, orchestrator, evaluator
-- **자동 활성화 불가**: skill-rules.json에 없어서 UserPromptSubmit 훅이 감지 못함
+### ✅ 해결 완료
 
-### 2. 중복 및 정리 필요 ✅ 일부 완료
-- **스킬 생성 중복**: skill-creator, skill-developer (유사 기능) - 검토 필요
-- ~~**AI Loop 중복**: codex-claude-loop, qwen-claude-loop (동일 패턴)~~ ✅ **해결됨** - dual-ai-loop으로 통합
-- **훅 중복**: skill-activation-prompt.ts, skill-activation-prompt-with-notification.ts
+1. **스킬 등록 개선** (Critical → Resolved)
+   - 핵심 워크플로우 스킬 8개 + 도구 생성 스킬 3개 모두 등록 완료
+   - 등록률: 33% → 87% (20/23)
+   - 자동 활성화 기능 정상화
 
-### 3. 워크플로우 연결 부족
-- 개별 스킬은 강력하지만 자동 연결이 미흡
-- 사용자가 수동으로 스킬 체인을 구성해야 함
+2. **중복 제거** (High → Resolved)
+   - meta-prompt-generator → meta-prompt-generator-v2 통합 완료
+   - skill-creator → skill-developer 통합 완료 (스크립트 포함)
+   - AI Loop 통합 완료 (dual-ai-loop)
 
-### 4. 문서화 부족
-- 각 스킬의 활용 예제가 제한적
-- 스킬 간 연동 가이드 부족
+3. **워크플로우 연결** (High → Resolved)
+   - /auto-workflow 커맨드 생성 완료
+   - 워크플로우별 커맨드 3개 생성 (simple, parallel, complex)
+   - 자동 체인 실행 가능
+
+### ⚠️ 남은 과제 (Minor)
+
+1. **미등록 스킬 6개**
+   - agent-workflow-orchestrator (중요도: 낮음 - agent-workflow-manager와 중복)
+   - command-creator, hooks-creator, subagent-creator, cli-updater, web-to-markdown
+
+2. **문서화 개선 필요**
+   - 각 스킬의 활용 예제 추가
+   - 워크플로우 사용 가이드 작성
 
 ---
 
@@ -475,10 +486,11 @@ allowed-tools: Task
 - [Slash Commands](https://docs.claude.com/en/docs/claude-code/slash-commands)
 
 ### 내부 문서
-- `docs/reports/`: 검증 및 분석 리포트
 - `docs/agent-patterns/`: 에이전트 패턴 문서
-- `docs/review/`: 스킬별 리뷰 보고서
-- `docs/skills-guide/`: 스킬 사용 가이드
+- `docs/TOOL-CREATORS-*.md`: 도구 생성 가이드 및 아키텍처
+- `docs/skills-guide/`: 스킬 사용 가이드 및 결정 트리
+- `README.md`: 설치 및 사용 가이드
+- `PLUGIN.md`: 플러그인 구조 및 기능 설명
 - 각 스킬 디렉토리의 `SKILL.md`
 
 ---
@@ -502,13 +514,27 @@ allowed-tools: Task
 
 ---
 
-**Last Updated**: 2025-11-17
-**Version**: 1.2.0
+**Last Updated**: 2025-11-19
+**Version**: 1.3.0
 **Maintainer**: @inchan
 
 ---
 
 ## 📝 변경 이력
+
+### v1.3.0 (2025-11-20)
+- ✅ **원격 저장소 머지**: 플러그인 구조, README, agents 디렉토리 통합
+- ✅ **스킬 등록 대폭 개선**: skill-rules.json에 20개 스킬 등록
+  - 워크플로우: agent-workflow-manager, advisor, router, parallel, orchestrator 등
+  - 도구 생성: command-creator, hooks-creator, subagent-creator
+  - 등록률: 33% → 87% (20/23)
+- ✅ **슬래시 커맨드 생성**: 워크플로우 커맨드 4개 추가
+  - /auto-workflow (통합 진입점)
+  - /workflow-simple, /workflow-parallel, /workflow-complex
+- ✅ **스킬 중복 제거**:
+  - meta-prompt-generator → meta-prompt-generator-v2 통합
+  - skill-creator → skill-developer 통합 (스크립트 포함)
+- ✅ **문서 현행화**: 실제 상태와 문서 동기화
 
 ### v1.2.0 (2025-11-17)
 - ✅ **디렉토리 구조 재편**: Claude Code 표준 구조로 마이그레이션
