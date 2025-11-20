@@ -1,11 +1,11 @@
 {
   "name": "inchan-cc-skills",
+  "description": "A comprehensive collection of Claude Code extensions including workflow automation, development guidelines, quality assurance tools, and intelligent task routing for enhanced productivity",
   "owner": {
     "name": "inchan",
     "email": "",
     "url": "https://github.com/inchan"
   },
-  "description": "Claude Code skills and hooks collection for enhanced development workflows",
   "plugins": [
     {
       "name": "cc-skills",
