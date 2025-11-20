@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { execSync } from 'child_process';
+import { join } from 'path';
 
 interface HookInput {
     session_id: string;
@@ -107,12 +106,6 @@ async function main() {
         const prompt = data.prompt.toLowerCase();
         const originalPrompt = data.prompt;
 
-        // Skip if already enhanced (prevent infinite loop)
-        if (process.env.SKIP_PROMPT_ENHANCE === '1' ||
-            prompt.includes('[enhanced]') ||
-            prompt.includes('__skip_enhance__')) {
-            process.exit(0);
-        }
 
         // Load skill rules - check multiple locations
         const homeDir = process.env.HOME || process.env.USERPROFILE || '';
@@ -210,31 +203,6 @@ async function main() {
             }
         }
 
-        // Enhance prompt using Claude CLI headless mode
-        let enhancedPrompt = '';
-        const shouldEnhance = matchedSkills.length > 0 || matchedEnhancements.length > 0;
-
-        if (shouldEnhance && originalPrompt.length > 10) {
-            try {
-                const enhanceInstruction = `prompt-enhancer 스킬을 사용하여 다음 프롬프트를 개선해주세요.
-개선된 프롬프트만 간결하게 출력하세요. 설명 없이 개선된 프롬프트 텍스트만 출력.
-
-원본 프롬프트: ${originalPrompt}`;
-
-                enhancedPrompt = execSync(
-                    `SKIP_PROMPT_ENHANCE=1 claude --print "${enhanceInstruction.replace(/"/g, '\\"')}"`,
-                    {
-                        encoding: 'utf-8',
-                        timeout: 30000,
-                        cwd: data.cwd,
-                        env: { ...process.env, SKIP_PROMPT_ENHANCE: '1' }
-                    }
-                ).trim();
-            } catch (err) {
-                // If enhancement fails, continue without it
-                enhancedPrompt = '';
-            }
-        }
 
         // Generate output if matches found
         if (matchedSkills.length > 0 || matchedEnhancements.length > 0) {
@@ -291,14 +259,7 @@ async function main() {
                 }
             }
 
-            // Add enhanced prompt if available
-            if (enhancedPrompt && enhancedPrompt.length > 0) {
-                output += '🚀 ENHANCED PROMPT:\n';
-                output += `${enhancedPrompt}\n\n`;
-                output += 'ACTION: Use the enhanced prompt above\n';
-            } else {
-                output += 'ACTION: Use Skill tool BEFORE responding\n';
-            }
+            output += 'ACTION: Use Skill tool BEFORE responding\n';
             output += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
 
             console.log(output);
