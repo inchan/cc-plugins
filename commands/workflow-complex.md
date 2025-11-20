@@ -2,7 +2,6 @@
 allowed-tools: Task, Read, Glob, Grep, AskUserQuestion
 description: 복잡한 프로젝트를 전문 에이전트들이 협업하여 처리합니다
 argument-hint: <프로젝트 설명>
-model: sonnet
 ---
 
 # Complex Workflow - 복잡한 프로젝트 처리
