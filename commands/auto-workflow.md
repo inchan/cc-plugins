@@ -2,7 +2,6 @@
 allowed-tools: Task, Read, Glob, Grep, AskUserQuestion
 description: 작업을 자동으로 분석하고 최적 워크플로우를 실행합니다
 argument-hint: <작업 설명>
-model: sonnet
 ---
 
 # Auto Workflow - 통합 워크플로우 자동 실행

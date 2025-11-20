@@ -2,7 +2,6 @@
 allowed-tools: Task, Read, Glob, Grep
 description: 순차 처리가 적합한 단순 작업을 체계적으로 실행합니다
 argument-hint: <작업 설명>
-model: sonnet
 ---
 
 # Simple Workflow - 순차 작업 처리

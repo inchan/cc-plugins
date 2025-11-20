@@ -2,7 +2,6 @@
 allowed-tools: Task, Read, Glob, Grep
 description: 독립적인 작업들을 병렬로 실행하여 효율성을 극대화합니다
 argument-hint: <작업 설명>
-model: sonnet
 ---
 
 # Parallel Workflow - 병렬 작업 처리
