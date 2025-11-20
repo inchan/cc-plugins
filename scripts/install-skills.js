@@ -165,8 +165,26 @@ async function selectTarget() {
   const pathIndex = args.indexOf('--path');
   if (pathIndex !== -1 && args[pathIndex + 1]) {
     const customPath = args[pathIndex + 1];
+    const resolved = path.resolve(customPath);
+
+    // 보안 검증
+    if (customPath.includes('..') || resolved.includes('..')) {
+      throw new Error('경로에 ".."을 포함할 수 없습니다.');
+    }
+
+    // 시스템 경로 방지
+    const dangerousPaths = ['/', '/etc', '/usr', '/bin', '/sbin', '/var', '/tmp'];
+    if (dangerousPaths.some(p => resolved === p || resolved.startsWith(p + '/'))) {
+      throw new Error(`시스템 경로는 허용되지 않습니다: ${resolved}`);
+    }
+
+    // .claude로 끝나는지 확인 (경고)
+    if (!resolved.endsWith('.claude')) {
+      logWarning(`경로가 .claude로 끝나지 않습니다: ${resolved}`);
+    }
+
     config.customPath = customPath;
-    logInfo(`특정 경로 사용: ${customPath}`);
+    logInfo(`특정 경로 사용: ${resolved}`);
     return customPath;
   }
 

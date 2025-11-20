@@ -250,6 +250,77 @@ function testSettingsFileSelection() {
 }
 
 // =============================================================================
+// customPath 보안 검증 테스트
+// =============================================================================
+
+function testCustomPathValidation() {
+  console.log('\n--- customPath 보안 검증 테스트 ---');
+
+  // 검증 로직 복제
+  function validateCustomPath(customPath) {
+    const resolved = path.resolve(customPath);
+
+    if (customPath.includes('..') || resolved.includes('..')) {
+      throw new Error('경로에 ".."을 포함할 수 없습니다.');
+    }
+
+    const dangerousPaths = ['/', '/etc', '/usr', '/bin', '/sbin', '/var', '/tmp'];
+    if (dangerousPaths.some(p => resolved === p || resolved.startsWith(p + '/'))) {
+      throw new Error(`시스템 경로는 허용되지 않습니다: ${resolved}`);
+    }
+
+    return resolved;
+  }
+
+  test('정상 경로 허용', () => {
+    const result = validateCustomPath('/home/user/project/.claude');
+    assert.ok(result.includes('.claude'));
+  });
+
+  test('경로 순회 공격 방지 (..)', () => {
+    assert.throws(() => {
+      validateCustomPath('../../../etc/passwd');
+    }, /경로에 "\.\."/);
+  });
+
+  test('상대 경로 순회 방지', () => {
+    assert.throws(() => {
+      validateCustomPath('./foo/../../../bar');
+    }, /경로에 "\.\."/);
+  });
+
+  test('루트 경로 거부', () => {
+    assert.throws(() => {
+      validateCustomPath('/');
+    }, /시스템 경로는 허용되지 않습니다/);
+  });
+
+  test('/etc 경로 거부', () => {
+    assert.throws(() => {
+      validateCustomPath('/etc/passwd');
+    }, /시스템 경로는 허용되지 않습니다/);
+  });
+
+  test('/usr 경로 거부', () => {
+    assert.throws(() => {
+      validateCustomPath('/usr/local/bin');
+    }, /시스템 경로는 허용되지 않습니다/);
+  });
+
+  test('/tmp 경로 거부', () => {
+    assert.throws(() => {
+      validateCustomPath('/tmp/malicious');
+    }, /시스템 경로는 허용되지 않습니다/);
+  });
+
+  test('홈 디렉토리 하위 허용', () => {
+    const home = process.env.HOME || process.env.USERPROFILE;
+    const result = validateCustomPath(path.join(home, 'projects/.claude'));
+    assert.ok(result.includes('.claude'));
+  });
+}
+
+// =============================================================================
 // 메인 실행
 // =============================================================================
 
@@ -265,7 +336,8 @@ function runAllTests() {
     testCleanSettingsLogic,
     testSkillsList,
     testPathCombinations,
-    testSettingsFileSelection
+    testSettingsFileSelection,
+    testCustomPathValidation
   ];
 
   for (const suite of testSuites) {
