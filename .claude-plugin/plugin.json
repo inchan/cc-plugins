@@ -19,6 +19,10 @@
     "development-guidelines",
     "task-orchestration"
   ],
-  "agents": "./agents/",
+  "agents": [
+    "./agents/architect.md",
+    "./agents/code-reviewer.md",
+    "./agents/workflow-orchestrator.md"
+  ],
   "hooks": "./hooks/hooks.json"
 }
