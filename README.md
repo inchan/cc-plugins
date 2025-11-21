@@ -1,406 +1,252 @@
-# CC-Skills
+# CC-Skills v2.0.0
 
-Claude Code용 스킬 및 훅 컬렉션 플러그인입니다.
+Claude Code용 모듈형 플러그인 마켓플레이스 - 워크플로우 자동화, 개발 가이드라인, 품질 도구
 
----
-
-## 아키텍처 개요
-
-```mermaid
-flowchart TB
-    subgraph Input["입력"]
-        UP[User Prompt]
-    end
-
-    subgraph Hooks["훅 시스템"]
-        UPS[UserPromptSubmit<br/>skill-forced-eval-hook]
-
-        SH[Stop<br/>lint-and-translate]
-    end
-
-    subgraph Router["라우팅"]
-        SGT[skill-generator-tool]
-        ITR[intelligent-task-router]
-    end
-
-    subgraph Workflow["워크플로우 엔진"]
-        AWM[agent-workflow-manager]
-        STP[sequential-task-processor]
-        PTE[parallel-task-executor]
-        DTO[dynamic-task-orchestrator]
-    end
-
-    subgraph Agents["서브에이전트"]
-        CR[code-reviewer]
-        AR[architect]
-        WO[workflow-orchestrator]
-    end
-
-    subgraph Quality["품질 관리"]
-        IQE[iterative-quality-enhancer]
-        RR[reflection-review]
-    end
-
-    subgraph Creators["도구 생성"]
-        CC[command-creator]
-        SD[skill-developer]
-        SAC[subagent-creator]
-        HC[hooks-creator]
-    end
-
-    subgraph Guidelines["개발 가이드"]
-        FDG[frontend-dev-guidelines]
-        BDG[backend-dev-guidelines]
-        ET[error-tracking]
-    end
-
-    UP --> UPS
-    UPS --> |스킬 제안| SGT
-    SGT --> |도구 생성| Creators
-    SGT --> |작업 처리| ITR
-
-    ITR --> |복잡도 분석| AWM
-    AWM --> |< 0.3| STP
-    AWM --> |0.3-0.7| PTE
-    AWM --> |> 0.7| DTO
-
-    STP --> Agents
-    PTE --> Agents
-    DTO --> Agents
-
-    Agents --> IQE
-    IQE --> RR
-
-    Creators --> |가이드 참조| Guidelines
-    Agents --> |가이드 참조| Guidelines
-
-
-    SH --> |최종 검증| Quality
-```
-
-### 연결 흐름
-
-1. **입력 처리**
-   User Prompt → UserPromptSubmit 훅
-
-2. **라우팅**
-   skill-generator-tool / intelligent-task-router
-
-3. **실행**
-   복잡도별 워크플로우 선택 → 에이전트 실행
-
-4. **품질 검증**
-   iterative-quality-enhancer → reflection-review
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/inchan/cc-skills/releases)
 
 ---
 
-## 설치
+## 🚀 v2.0.0 Multi-Plugin Architecture
 
-### 개발자 설치 (로컬 테스트)
+anthropics/claude-code 패턴을 따라 **7개 독립 플러그인**으로 재구성되었습니다.
 
-1. 저장소 클론
-   ```bash
-   git clone https://github.com/inchan/cc-skills.git
-   cd cc-skills
-   ```
+### 📦 플러그인 목록
 
-2. 빌드 및 설치
-   ```bash
-   npm run build
-   npm run sync
-   ```
+| 플러그인 | 스킬 | 설명 | 문서 |
+|---------|-----|------|------|
+| [workflow-automation](plugins/workflow-automation) | 7 | 복잡도 기반 작업 라우팅 | [README](plugins/workflow-automation/README.md) |
+| [dev-guidelines](plugins/dev-guidelines) | 3 | Frontend/Backend 개발 패턴 | [README](plugins/dev-guidelines/README.md) |
+| [tool-creators](plugins/tool-creators) | 5 | Skill/Command/Agent/Hook 생성 | [README](plugins/tool-creators/README.md) |
+| [quality-review](plugins/quality-review) | 2 | 5차원 품질 평가 | [README](plugins/quality-review/README.md) |
+| [ai-integration](plugins/ai-integration) | 3 | 외부 AI CLI 통합 | [README](plugins/ai-integration/README.md) |
+| [prompt-enhancement](plugins/prompt-enhancement) | 2 | 메타 프롬프트 생성 | [README](plugins/prompt-enhancement/README.md) |
+| [utilities](plugins/utilities) | 1 | 유틸리티 도구 | [README](plugins/utilities/README.md) |
 
-3. Claude Code 재시작
+**총계**: 23 스킬, 4 커맨드, 3 에이전트
 
-### 사용자 설치 (향후)
+---
 
-마켓플레이스를 통한 설치:
-```bash
-/plugin marketplace add inchan/cc-skills
-/plugin install cc-skills
-```
+## ⚡ Quick Start
 
-### 훅 설치 (별도 설치 필요)
-
-**⚠️ 중요**: 훅은 플러그인에 포함되지 않으므로 별도 설치가 필요합니다.
+### 설치 방법
 
 ```bash
-# 자동 설치 (권장)
-node scripts/install-hooks.js
+# 1. 레포지토리 클론
+git clone https://github.com/inchan/cc-skills.git
 
-# 자동 확인 모드
-node scripts/install-hooks.js --yes
-
-# 시뮬레이션
-node scripts/install-hooks.js --dry-run
+# 2. Claude Code에서 마켓플레이스로 추가
+# Settings → Plugins → Add Marketplace
+# Path: /path/to/cc-skills
 ```
 
-설치 스크립트는 다음 작업을 자동으로 수행합니다:
-- 훅 파일을 `~/.claude/hooks/`로 복사
-- 실행 권한 설정
-- `~/.claude/settings.json` 업데이트
-- 의존성 설치
+### 선택적 설치
 
-자세한 내용은 [hooks/README.md](hooks/README.md)를 참조하세요.
+필요한 플러그인만 선택적으로 활성화 가능:
+- Workflow automation만 필요? → `workflow-automation` 플러그인만 활성화
+- 개발 가이드만? → `dev-guidelines` 플러그인만 활성화
 
 ---
 
-## 스킬 목록
+## 📚 주요 기능
 
-<details>
-<summary><b>워크플로우 관리</b> (7개)</summary>
+### 1. Workflow Automation
 
-**agent-workflow-manager**
-- 전체 워크플로우 자동 관리
-- 복잡도 분석 → Router/Sequential/Parallel/Orchestrator → Evaluator 자동 연결
+복잡도 기반 자동 라우팅:
 
-**agent-workflow-advisor**
-- 패턴 추천 어드바이저
-- 5가지 패턴 중 최적 패턴 제안
+```
+User Prompt
+  ↓
+intelligent-task-router (복잡도 분석 0.0-1.0)
+  ↓
+├─ < 0.3: sequential-task-processor (순차)
+├─ 0.3-0.7: parallel-task-executor (병렬)
+└─ > 0.7: dynamic-task-orchestrator (동적)
+```
 
-**agent-workflow-orchestrator**
-- 고급 오케스트레이션
-- 다중 에이전트 조율
+**커맨드:**
+- `/auto-workflow` - 자동 워크플로우
+- `/workflow-simple`, `/workflow-parallel`, `/workflow-complex`
 
-**intelligent-task-router**
-- 작업 분류 및 라우팅
-- 8개 카테고리로 분류 후 적합한 경로로 라우팅
+### 2. Dev Guidelines
 
-**parallel-task-executor**
-- 병렬 작업 실행
-- Sectioning/Voting 모드로 2-10x 속도 향상
+#### Frontend (React + TypeScript)
+- MUI v7 (Grid2, Suspense)
+- TanStack Router
+- 성능 최적화 패턴
 
-**dynamic-task-orchestrator**
-- 복잡한 프로젝트 조율
-- 6개 전문 워커 동적 할당 (복잡도 0.7+)
+#### Backend (Node.js + Express)
+- Layered architecture
+- Prisma ORM
+- Zod validation
 
-**sequential-task-processor**
-- 순차 작업 처리
-- 의존성 있는 작업 단계별 실행
+#### Error Tracking
+- Sentry v8 통합
+- 모든 에러 캡처
 
-</details>
+### 3. Tool Creators
 
-<details>
-<summary><b>품질 관리</b> (2개)</summary>
+```
+"도구를 만들고 싶어"
+  ↓
+skill-generator-tool (의도 분석)
+  ↓
+타입 추천 (Command/Skill/Subagent/Hook)
+  ↓
+해당 creator로 라우팅
+```
 
-**iterative-quality-enhancer**
-- 품질 평가 및 최적화
-- 5개 차원 평가, 최대 5회 반복 개선
+### 4. Quality Review
 
-**reflection-review**
-- 코드 결과 평가 및 성찰 기반 리뷰
-- 6개 영역 점수화, P0/P1/P2 피드백
+**5차원 평가** (iterative-quality-enhancer):
+- Functionality, Performance, Code Quality, Security, Documentation
 
-</details>
+**6영역 리뷰** (reflection-review):
+- P0/P1/P2 우선순위 피드백
 
-<details>
-<summary><b>개발 가이드</b> (3개)</summary>
+### 5. AI Integration
 
-**frontend-dev-guidelines**
-- React/TypeScript/MUI v7
-- Suspense, lazy loading, TanStack Router
-
-**backend-dev-guidelines**
-- Node.js/Express/Prisma
-- 레이어드 아키텍처, Zod 검증
-
-**error-tracking**
-- Sentry v8 패턴
-- 에러 캡처, 성능 모니터링
-
-</details>
-
-<details>
-<summary><b>도구 생성</b> (5개)</summary>
-
-**skill-generator-tool**
-- 도구 타입 추천
-- Command/Skill/Subagent/Hook 중 최적 타입 선택
-
-**command-creator**
-- 슬래시 커맨드 생성
-- frontmatter + 프롬프트 .md 파일
-
-**skill-developer**
-- 스킬 개발 종합 가이드
-- SKILL.md + 번들 리소스, 500줄 규칙, Anthropic 공식 표준
-
-**subagent-creator**
-- 서브에이전트 생성
-- 7개 템플릿 기반
-
-**hooks-creator**
-- 훅 생성
-- 6개 이벤트 지원
-
-</details>
-
-<details>
-<summary><b>AI 연동</b> (2개)</summary>
-
-**dual-ai-loop**
-- 외부 AI CLI 협업
-- codex, qwen, copilot, rovo-dev, aider
-- 계획-구현-리뷰 사이클
-
-**cli-updater**
-- CLI 버전 업데이트
-- 어댑터 스킬 및 문서 자동 업데이트
-
-</details>
-
-<details>
-<summary><b>프롬프트</b> (2개)</summary>
-
-**meta-prompt-generator**
-- 슬래시 커맨드용 프롬프트 생성
-- 구조화된 단계별 병렬 처리 가능한 프롬프트
-
-**prompt-enhancer**
-- 컨텍스트 기반 프롬프트 개선
-- 프로젝트 구조/패턴 분석
-
-</details>
-
-<details>
-<summary><b>기타</b> (2개)</summary>
-
-**route-tester**
-- 인증 라우트 테스트
-- mock 인증 패턴
-
-**web-to-markdown**
-- 웹페이지 변환
-- URL → 마크다운 파일
-
-</details>
+외부 AI CLI 통합 (Dual-AI Loop):
+- aider, codex, qwen, copilot, rovo-dev
 
 ---
 
-## 에이전트
-
-**code-reviewer**
-- 코드 품질/보안 리뷰
-- OWASP Top 10, SOLID/DRY/KISS 원칙
-- Critical → Low 우선순위 피드백
-
-**architect**
-- 시스템 아키텍처 설계
-- ADR 형식 문서화
-- 트레이드오프 분석
-
-**workflow-orchestrator**
-- 워크플로우 오케스트레이션
-- 복잡도(0.0-1.0) 분석
-- 서브에이전트 실행 조율
-
----
-
-## 훅
-
-**UserPromptSubmit**
-- `skill-forced-eval-hook.sh`
-- 키워드/인텐트 매칭 → 스킬 제안
-
-
-**Stop**
-- `stop-hook-lint-and-translate.sh`
-- 린트 실행 및 번역
-
----
-
-## 워크플로우 선택
-
-**복잡도 < 0.3**
-- `sequential-task-processor`
-- 단순 순차 작업
-
-**복잡도 0.3 - 0.7**
-- `parallel-task-executor`
-- 독립적인 다중 작업
-
-**복잡도 > 0.7**
-- `dynamic-task-orchestrator`
-- 복잡한 시스템 구축
-
-**자동 판단**
-- `agent-workflow-manager`
-- 복잡도 자동 분석
-
-## 사용법
-
-플러그인 활성화 후 프롬프트를 입력하면 `UserPromptSubmit` 훅이 적합한 스킬을 자동으로 제안합니다.
-
-```bash
-# 스킬 수동 호출
-/skill frontend-dev-guidelines
-/skill backend-dev-guidelines
-/skill agent-workflow-manager
-```
-
-## 디렉토리 구조
-
-```
-cc-skills/
-├── .claude-plugin/       # 플러그인 메타데이터
-│   ├── plugin.json       # 플러그인 매니페스트
-│   └── marketplace.json  # 마켓플레이스 설정
-├── skills/               # 스킬 컬렉션 (23개)
-│   ├── skill-rules.json  # 스킬 자동 활성화 규칙
-│   └── */                # 개별 스킬 디렉토리
-├── commands/             # 슬래시 커맨드
-├── hooks/                # 훅 스크립트 및 설정
-│   ├── hooks.json        # 훅 설정
-│   └── *.{ts,js,sh}      # 훅 스크립트
-├── agents/               # 서브에이전트 (3개)
-├── scripts/              # 유틸리티 스크립트
-│   ├── install-skills.js # 스킬 설치 스크립트
-│   └── install-hooks.js  # 훅 설치 스크립트
-├── settings.local.json   # 로컬 설정 및 권한
-├── .claude/              # 레거시 (settings.json만 포함)
-└── docs/                 # 문서
-```
-
-## 요구사항
-
-- Claude Code CLI
-- Node.js 18+
-
-## 개발
+## 🏗️ 아키텍처
 
 ### 디렉토리 구조
 
-- `src/` - 원본 소스 파일 (편집용)
-- `plugin/` - 빌드 결과물 (배포용, Git 제외)
-- `scripts/` - 빌드 및 배포 스크립트
-- `tests/` - 검증 스크립트
+```
+plugins/
+├── workflow-automation/    # 워크플로우 자동화
+│   ├── .claude-plugin/
+│   │   └── plugin.json
+│   ├── skills/ (7개)
+│   ├── commands/ (4개)
+│   └── agents/ (1개)
+├── dev-guidelines/         # 개발 가이드
+├── tool-creators/          # 도구 생성
+├── quality-review/         # 품질 리뷰
+├── ai-integration/         # AI 통합
+├── prompt-enhancement/     # 프롬프트 최적화
+└── utilities/              # 유틸리티
 
-### 빌드 및 배포
+hooks/                      # 전역 hooks
+├── skill-activation-hook.sh
+└── hooks.json
 
-```bash
-# 빌드
-npm run build
-
-# 로컬 마켓플레이스에 동기화 (미리보기)
-npm run sync:dry-run
-
-# 로컬 마켓플레이스에 동기화
-npm run sync
-
-# 새 버전 배포
-npm run publish:patch   # 1.4.0 → 1.4.1
-npm run publish:minor   # 1.4.0 → 1.5.0
-npm run publish:major   # 1.4.0 → 2.0.0
+.claude-plugin/
+└── marketplace.json        # 마켓플레이스 메타데이터
 ```
 
-### 개발 워크플로우
+### 플러그인 독립성
 
-1. `src/` 디렉토리에서 스킬/커맨드/훅 편집
-2. `npm run build` 실행 → `plugin/` 생성
-3. `npm run sync` 실행 → 로컬 마켓플레이스 업데이트
-4. Claude Code 재시작하여 테스트
-5. 완료 후 `npm run publish:patch` 실행
+- ✅ Zero cross-plugin dependencies
+- ✅ 개별 버전 관리
+- ✅ 선택적 활성화/비활성화
+- ✅ 독립적 업데이트
 
-## 라이선스
+---
 
-MIT
+## 🛠️ 개발
+
+### 의존성 분석
+
+```bash
+# 스킬 간 의존성 분석
+node scripts/analyze-dependencies.js
+```
+
+### 새 플러그인 추가
+
+```bash
+# 1. 플러그인 구조 생성
+mkdir -p plugins/new-plugin/{.claude-plugin,skills,commands,agents}
+
+# 2. plugin.json 작성
+cat > plugins/new-plugin/.claude-plugin/plugin.json <<EOF
+{
+  "name": "new-plugin",
+  "version": "2.0.0",
+  "description": "Plugin description",
+  "skills": ["./skills"]
+}
+EOF
+
+# 3. marketplace.json 업데이트
+# .claude-plugin/marketplace.json에 플러그인 추가
+```
+
+### 테스트
+
+```bash
+# 플러그인 JSON 검증
+for plugin in plugins/*/; do
+  node -e "JSON.parse(require('fs').readFileSync('${plugin}.claude-plugin/plugin.json'))"
+done
+
+# skill-rules.json 검증
+for rules in plugins/*/skills/skill-rules.json; do
+  node -e "JSON.parse(require('fs').readFileSync('$rules'))"
+done
+```
+
+---
+
+## 📖 문서
+
+- **[CLAUDE.md](CLAUDE.md)** - 개발 가이드 (Claude Code용)
+- **[PLUGIN.md](PLUGIN.md)** - 플러그인 구조 상세
+- **[docs/](docs/)** - 추가 문서
+  - [SKILL-DEVELOPMENT-GUIDE.md](docs/SKILL-DEVELOPMENT-GUIDE.md)
+  - [DOCUMENTATION_GUIDELINES.md](docs/DOCUMENTATION_GUIDELINES.md)
+
+---
+
+## 🔄 마이그레이션 (v1.x → v2.0.0)
+
+v1.x 단일 플러그인 구조에서 v2.0.0 멀티 플러그인으로:
+
+**주요 변경사항:**
+- `src/` 제거 → `plugins/` 독립 구조
+- skill-rules.json 플러그인별 분할
+- 빌드 프로세스 제거 (직접 Git 추적)
+
+**마이그레이션 스크립트:**
+```bash
+# 자동 마이그레이션 (참고용)
+bash scripts/migrate-to-multi-plugin.sh
+```
+
+---
+
+## 🤝 기여
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+---
+
+## 📜 License
+
+MIT License - see [LICENSE](LICENSE) file
+
+---
+
+## 🙏 Acknowledgments
+
+- [Anthropic Claude Code](https://claude.ai/code)
+- [anthropics/claude-code](https://github.com/anthropics/claude-code) - Plugin pattern reference
+- [Anthropic Agent Skills Guide](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
+
+---
+
+## 📊 Stats
+
+![GitHub stars](https://img.shields.io/github/stars/inchan/cc-skills?style=social)
+![GitHub forks](https://img.shields.io/github/forks/inchan/cc-skills?style=social)
+![GitHub issues](https://img.shields.io/github/issues/inchan/cc-skills)
+
+**v2.0.0** - Multi-Plugin Architecture Release 🎉
