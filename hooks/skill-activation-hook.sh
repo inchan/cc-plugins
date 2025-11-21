@@ -36,7 +36,7 @@ SKILL_RULES_FILES=()
 for plugin_dir in "${REPO_ROOT}/plugins/"*/; do
     if [[ -f "${plugin_dir}skills/skill-rules.json" ]]; then
         SKILL_RULES_FILES+=("${plugin_dir}skills/skill-rules.json")
-        echo "[DEBUG] Found: ${plugin_dir}skills/skill-rules.json" >> "$LOG_FILE"
+        echo "[DEBUG] Found1234: ${plugin_dir}skills/skill-rules.json" >> "$LOG_FILE"
     fi
 done
 
@@ -74,12 +74,8 @@ done
 TOTAL_SKILLS=$(wc -l < "$AGGREGATED_SKILLS")
 echo "[DEBUG] Total skills aggregated: ${TOTAL_SKILLS}" >> "$LOG_FILE"
 
-# Output instruction to Claude
-cat <<'EOF'
-INSTRUCTION: MULTI-PLUGIN SKILL ACTIVATION
-
-Available Skills by Plugin:
-EOF
+# Build output message
+OUTPUT_MSG="INSTRUCTION: MULTI-PLUGIN SKILL ACTIVATION\n\nAvailable Skills by Plugin:\n"
 
 # Sort by plugin name first
 SORTED_SKILLS=$(mktemp)
@@ -87,33 +83,33 @@ sort -t'|' -k2,2 -k3,3 "$AGGREGATED_SKILLS" > "$SORTED_SKILLS"
 
 # Group by plugin and display
 if [[ $TOTAL_SKILLS -gt 0 ]]; then
-    echo ""
+    OUTPUT_MSG="${OUTPUT_MSG}\n"
     current_plugin=""
     while IFS='|' read -r priority plugin skill keywords; do
         if [[ "$plugin" != "$current_plugin" ]]; then
-            echo ""
-            echo "📦 Plugin: $plugin"
+            OUTPUT_MSG="${OUTPUT_MSG}\n📦 Plugin: $plugin\n"
             current_plugin="$plugin"
         fi
-        echo "  - $skill [priority: $priority]"
+        OUTPUT_MSG="${OUTPUT_MSG}  - $skill [priority: $priority]\n"
     done < "$SORTED_SKILLS"
-    echo ""
+    OUTPUT_MSG="${OUTPUT_MSG}\n"
     rm -f "$SORTED_SKILLS"
 fi
 
-cat <<'EOF'
+OUTPUT_MSG="${OUTPUT_MSG}\nStep 1 - EVALUATE:\nFor each skill above, state: [plugin:skill-name] - YES/NO - [reason]\n\n"
+OUTPUT_MSG="${OUTPUT_MSG}Step 2 - ACTIVATE:\nUse Skill(\"plugin-name:skill-name\") for each YES skill\n"
+OUTPUT_MSG="${OUTPUT_MSG}Example: Skill(\"workflow-automation:intelligent-task-router\")\n\n"
+OUTPUT_MSG="${OUTPUT_MSG}Step 3 - IMPLEMENT:\nProceed with implementation after activation\n\n"
+OUTPUT_MSG="${OUTPUT_MSG}CRITICAL: Skills are now namespaced by plugin (plugin-name:skill-name)"
 
-Step 1 - EVALUATE:
-For each skill above, state: [plugin:skill-name] - YES/NO - [reason]
-
-Step 2 - ACTIVATE:
-Use Skill("plugin-name:skill-name") for each YES skill
-Example: Skill("workflow-automation:intelligent-task-router")
-
-Step 3 - IMPLEMENT:
-Proceed with implementation after activation
-
-CRITICAL: Skills are now namespaced by plugin (plugin-name:skill-name)
+# Output as JSON for Claude Code
+cat << EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "UserPromptSubmit",
+    "additionalContext": "$(echo -e "$OUTPUT_MSG" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')"
+  }
+}
 EOF
 
 # Cleanup
