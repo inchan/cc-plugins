@@ -9,5 +9,5 @@
   "license": "MIT",
   "skills": ["./skills"],
   "commands": ["./commands"],
-  "agents": ["./agents/workflow-orchestrator.md"]
+  "agents": ["./agents"]
 }

@@ -1,5 +1,19 @@
 # Tool Creator Skills - Architecture & Relationships
 
+## 목차
+
+1. [Overall Architecture](#overall-architecture)
+2. [Initialization Flow (Unified Pattern)](#initialization-flow-unified-pattern)
+3. [File & Directory Structure](#file--directory-structure)
+4. [Data Flow: Command Creation Example](#data-flow-command-creation-example)
+5. [Template Inheritance Pattern](#template-inheritance-pattern)
+6. [Validation Architecture](#validation-architecture)
+7. [Shared Utilities (Current State: Duplicated)](#shared-utilities-current-state-duplicated)
+8. [Proposed Unified Architecture](#proposed-unified-architecture)
+9. [Integration Points](#integration-points)
+10. [Quality & Testing Strategy](#quality--testing-strategy)
+11. [Current State vs. Unified Target](#current-state-vs-unified-target)
+
 ---
 
 ## Overall Architecture

@@ -6,5 +6,7 @@
     "name": "inchan",
     "url": "https://github.com/inchan"
   },
-  "hooks": "./hooks.json"
+  "hooks": [
+    "./hooks.json"
+  ]
 }

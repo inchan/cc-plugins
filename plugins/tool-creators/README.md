@@ -2,10 +2,11 @@
 
 Claude Code 도구 생성 종합 툴킷 (Anthropic 베스트 프랙티스)
 
-## 포함 스킬 (5개)
+## 포함 스킬 (6개)
 
 - **skill-generator-tool** - 진입점: 도구 타입 추천
 - **skill-developer** - Skill 개발 (500줄 규칙, 번들 리소스)
+- **skill-health-checker** - 스킬 품질 진단 및 개선 제안
 - **command-creator** - Slash command 생성
 - **subagent-creator** - Subagent 생성 (7개 템플릿)
 - **hooks-creator** - Hook 생성 (6개 이벤트)

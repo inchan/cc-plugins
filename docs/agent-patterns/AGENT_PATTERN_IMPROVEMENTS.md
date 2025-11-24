@@ -3,6 +3,19 @@
 **Date**: 2025-11-17
 **Reference**: https://www.anthropic.com/engineering/building-effective-agents
 
+## 목차
+
+1. [Executive Summary](#executive-summary)
+2. [Before vs. After Analysis](#before-vs-after-analysis)
+3. [Cross-Pattern Integration](#cross-pattern-integration)
+4. [Pattern Selection Guide](#pattern-selection-guide)
+5. [Anthropic Reference Alignment](#anthropic-reference-alignment)
+6. [Files Changed](#files-changed)
+7. [Quality Metrics](#quality-metrics)
+8. [Key Learnings](#key-learnings)
+9. [Recommendations](#recommendations)
+10. [Conclusion](#conclusion)
+
 ---
 
 ## Executive Summary

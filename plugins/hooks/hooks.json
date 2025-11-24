@@ -1,0 +1,32 @@
+{
+  "name": "cc-skills-hooks",
+  "version": "2.0.0",
+  "description": "CC-Skills hooks for skill activation and linting",
+  "author": {
+    "name": "inchan",
+    "url": "https://github.com/inchan"
+  },
+  "license": "MIT",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/skill-activation-hook.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/stop-hook-lint-and-translate.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

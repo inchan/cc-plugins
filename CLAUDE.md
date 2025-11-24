@@ -1,5 +1,10 @@
 # CLAUDE.md
 
+---
+version: 2.0.0
+last_updated: 2025-11-24
+---
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Multi-Plugin Architecture (v2.0.0)
@@ -12,13 +17,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 |---------|--------|------|
 | **workflow-automation** | 7 | 복잡도 기반 작업 라우팅 (순차/병렬/동적) |
 | **dev-guidelines** | 3 | Frontend/Backend 개발 패턴, 에러 추적 |
-| **tool-creators** | 5 | Skill/Command/Agent/Hook 생성 도구 |
+| **tool-creators** | 6 | Skill/Command/Agent/Hook 생성 도구 |
 | **quality-review** | 2 | 5차원 품질 평가, P0/P1/P2 피드백 |
 | **ai-integration** | 3 | 외부 AI CLI 통합 (codex, qwen, aider 등) |
 | **prompt-enhancement** | 2 | 메타 프롬프트 생성, 프롬프트 최적화 |
 | **utilities** | 1 | 유틸리티 도구 (route-tester) |
 
-**총계**: 23 스킬, 4 커맨드, 3 에이전트
+**총계**: 24 스킬, 4 커맨드, 3 에이전트
 
 ### 디렉토리 구조
 
@@ -306,7 +311,7 @@ docs/
 
 ## Plugin Status Summary
 
-**스킬**: 23개 (20개 skill-rules.json 등록)
+**스킬**: 24개 (20개 skill-rules.json 등록)
 **에이전트**: 3개 (code-reviewer, architect, workflow-orchestrator)
 **훅**: 3개 (UserPromptSubmit, PostToolUse, Stop)
 **슬래시 커맨드**: 4개 (auto-workflow, workflow-simple/parallel/complex)

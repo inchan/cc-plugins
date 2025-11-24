@@ -17,13 +17,13 @@ anthropics/claude-code 패턴을 따라 **7개 독립 플러그인**으로 재�
 |---------|-----|------|------|
 | [workflow-automation](plugins/workflow-automation) | 7 | 복잡도 기반 작업 라우팅 | [README](plugins/workflow-automation/README.md) |
 | [dev-guidelines](plugins/dev-guidelines) | 3 | Frontend/Backend 개발 패턴 | [README](plugins/dev-guidelines/README.md) |
-| [tool-creators](plugins/tool-creators) | 5 | Skill/Command/Agent/Hook 생성 | [README](plugins/tool-creators/README.md) |
+| [tool-creators](plugins/tool-creators) | 6 | Skill/Command/Agent/Hook 생성 | [README](plugins/tool-creators/README.md) |
 | [quality-review](plugins/quality-review) | 2 | 5차원 품질 평가 | [README](plugins/quality-review/README.md) |
 | [ai-integration](plugins/ai-integration) | 3 | 외부 AI CLI 통합 | [README](plugins/ai-integration/README.md) |
 | [prompt-enhancement](plugins/prompt-enhancement) | 2 | 메타 프롬프트 생성 | [README](plugins/prompt-enhancement/README.md) |
 | [utilities](plugins/utilities) | 1 | 유틸리티 도구 | [README](plugins/utilities/README.md) |
 
-**총계**: 23 스킬, 4 커맨드, 3 에이전트
+**총계**: 24 스킬, 4 커맨드, 3 에이전트
 
 ---
 

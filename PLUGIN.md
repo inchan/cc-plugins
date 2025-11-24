@@ -1,5 +1,10 @@
 # CC-Skills Plugin Architecture (v2.0.0)
 
+---
+version: 2.0.0
+last_updated: 2025-11-24
+---
+
 Claude Code용 모듈형 플러그인 컬렉션 - 7개 독립 플러그인으로 구성
 
 ## 📦 플러그인 목록
@@ -8,13 +13,13 @@ Claude Code용 모듈형 플러그인 컬렉션 - 7개 독립 플러그인으로
 |---------|--------|------|------|
 | [workflow-automation](plugins/workflow-automation) | 7 | 복잡도 기반 작업 라우팅 | 필수 |
 | [dev-guidelines](plugins/dev-guidelines) | 3 | Frontend/Backend 개발 패턴 | 권장 |
-| [tool-creators](plugins/tool-creators) | 5 | Skill/Command/Agent/Hook 생성 | 권장 |
+| [tool-creators](plugins/tool-creators) | 6 | Skill/Command/Agent/Hook 생성 | 권장 |
 | [quality-review](plugins/quality-review) | 2 | 5차원 품질 평가 | 권장 |
 | [ai-integration](plugins/ai-integration) | 3 | 외부 AI CLI 통합 | 선택 |
 | [prompt-enhancement](plugins/prompt-enhancement) | 2 | 메타 프롬프트 생성 | 선택 |
 | [utilities](plugins/utilities) | 1 | 유틸리티 도구 | 선택 |
 
-**총 23개 스킬, 4개 커맨드, 3개 에이전트**
+**총 24개 스킬, 4개 커맨드, 3개 에이전트**
 
 ---
 
@@ -134,9 +139,10 @@ cc-skills/
 
 **목적**: 스킬/커맨드/에이전트/훅 생성 도구
 
-**스킬** (5개):
+**스킬** (6개):
 - `skill-generator-tool` (critical) - 도구 타입 추천
 - `skill-developer` (high) - 스킬 개발 가이드
+- `skill-health-checker` (medium) - 스킬 품질 진단
 - `command-creator` (high) - 커맨드 생성
 - `hooks-creator` (high) - 훅 생성
 - `subagent-creator` (high) - 에이전트 생성
@@ -288,7 +294,7 @@ bash scripts/migrate-to-multi-plugin.sh
 
 ## 📊 통계
 
-- **23개 스킬** (20개 등록 + 3개 unregistered)
+- **24개 스킬** (20개 등록 + 4개 unregistered)
 - **4개 슬래시 커맨드**
 - **3개 에이전트**
 - **3개 전역 훅**

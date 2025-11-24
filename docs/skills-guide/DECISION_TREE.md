@@ -2,6 +2,17 @@
 
 **When should you use what? This guide helps you choose the right tool for your task.**
 
+## 목차
+
+1. [Quick Decision Flow](#quick-decision-flow)
+2. [Detailed Decision Matrix](#detailed-decision-matrix)
+3. [Side-by-Side Comparison](#side-by-side-comparison)
+4. [Context Window Considerations](#context-window-considerations)
+5. [Common Patterns](#common-patterns)
+6. [Red Flags: When You're Using the Wrong Tool](#red-flags-when-youre-using-the-wrong-tool)
+7. [Quick Reference Card](#quick-reference-card)
+8. [Final Advice](#final-advice)
+
 ---
 
 ## Quick Decision Flow

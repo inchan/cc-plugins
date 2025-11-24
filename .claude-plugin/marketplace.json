@@ -11,7 +11,7 @@
     {
       "name": "cc-skills-hooks",
       "version": "2.0.0",
-      "source": "./hooks",
+      "source": "./plugins/hooks",
       "description": "Skill activation hooks for all CC-Skills plugins"
     },
     {
