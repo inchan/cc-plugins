@@ -1,11 +1,14 @@
-# CC-Skills Plugin Architecture (v2.0.0)
+# CC-Skills Plugin Architecture
 
 ---
-version: 2.0.0
-last_updated: 2025-11-24
+version: 0.0.1
+last_updated: 2025-11-26
+status: pre-release
 ---
 
-Claude Code용 모듈형 플러그인 컬렉션 - 7개 독립 플러그인으로 구성
+> **⚠️ Pre-release**: 현재 v0.0.1 개발 버전입니다. 정식 릴리스는 v1.0.0부터 시작됩니다.
+
+Claude Code용 모듈형 플러그인 컬렉션 - 9개 독립 플러그인 + 1개 메타 플러그인으로 구성
 
 ## 📦 플러그인 목록
 
@@ -18,27 +21,54 @@ Claude Code용 모듈형 플러그인 컬렉션 - 7개 독립 플러그인으로
 | [ai-integration](plugins/ai-integration) | 3 | 외부 AI CLI 통합 | 선택 |
 | [prompt-enhancement](plugins/prompt-enhancement) | 2 | 메타 프롬프트 생성 | 선택 |
 | [utilities](plugins/utilities) | 1 | 유틸리티 도구 | 선택 |
+| [research](plugins/research) | 1 | 공식 자료 조사 | 선택 |
+| [hooks](plugins/hooks) | - | Multi-Tier 스킬 자동 활성화 | 필수 |
+| [**install-all**](plugins/install-all) | **Meta** | **모든 플러그인 통합 설치** | **권장** |
 
-**총 24개 스킬, 4개 커맨드, 3개 에이전트**
+**총 25개 스킬, 4개 커맨드, 3개 에이전트, 3개 훅 (9개 플러그인 + 1개 메타)**
 
 ---
 
 ## 🚀 설치 방법
 
-### Claude Code 마켓플레이스
+### 옵션 1: install-all 메타 플러그인 (권장)
 
 ```bash
 # 1. 레포지토리 클론
 git clone https://github.com/inchan/cc-skills.git
 
-# 2. Claude Code에서 마켓플레이스로 추가
+# 2. install-all 플러그인 설치 (모든 기능 포함)
+claude plugins install /path/to/cc-skills/plugins/install-all
+```
+
+**장점**:
+- ✅ 한 번의 설치로 모든 기능 사용
+- ✅ 상대 경로 참조로 파일 중복 없음
+- ✅ 자동 업데이트 스크립트 지원
+
+**주의**:
+- ⚠️ 상대 경로 참조는 실험적 기능
+- 작동하지 않으면 옵션 2 사용
+
+### 옵션 2: 마켓플레이스 전체 설치
+
+```bash
+# Claude Code에서 마켓플레이스로 추가
 # Settings → Plugins → Add Marketplace
 # Path: /path/to/cc-skills
 ```
 
-### 플러그인 선택적 활성화
+### 옵션 3: 플러그인 선택적 설치
 
-Claude Code Settings에서 필요한 플러그인만 활성화:
+필요한 플러그인만 개별 설치:
+
+```bash
+# 개별 플러그인 설치
+claude plugins install /path/to/cc-skills/plugins/workflow-automation
+claude plugins install /path/to/cc-skills/plugins/dev-guidelines
+```
+
+또는 Claude Code Settings에서 활성화:
 
 ```json
 {
@@ -54,12 +84,12 @@ Claude Code Settings에서 필요한 플러그인만 활성화:
 
 ## 🏗️ 플러그인 아키텍처
 
-### v2.0.0 Multi-Plugin 구조
+### Multi-Plugin 구조
 
 ```
 cc-skills/
 ├── .claude-plugin/
-│   └── marketplace.json         # 7개 플러그인 정의
+│   └── marketplace.json         # 10개 플러그인 정의 (9 + install-all)
 │
 ├── plugins/
 │   ├── workflow-automation/
@@ -73,19 +103,28 @@ cc-skills/
 │   │   ├── commands/            # 4개 슬래시 커맨드
 │   │   └── agents/              # 1개 에이전트
 │   │
+│   ├── hooks/                   # 스킬 자동 활성화 시스템
+│   │   ├── .claude-plugin/plugin.json
+│   │   ├── skill-activation-hook.sh
+│   │   └── hooks.json
+│   │
 │   ├── dev-guidelines/
 │   ├── tool-creators/
 │   ├── quality-review/
 │   ├── ai-integration/
 │   ├── prompt-enhancement/
-│   └── utilities/
+│   ├── utilities/
+│   ├── research/
+│   │
+│   └── install-all/             # 🎯 메타 플러그인
+│       ├── .claude-plugin/
+│       │   └── plugin.json     # 상대 경로로 모든 플러그인 참조
+│       └── README.md
 │
-├── hooks/                       # 전역 hooks (공유)
-│   ├── skill-activation-hook.sh
-│   ├── stop-hook-lint-and-translate.sh
-│   └── hooks.json
+├── scripts/
+│   ├── update-install-all.js   # install-all 자동 업데이트
+│   └── analyze-dependencies.js
 │
-├── scripts/                     # 유틸리티 스크립트
 └── docs/                        # 문서
 ```
 
@@ -194,6 +233,18 @@ cc-skills/
 **스킬** (1개):
 - `route-tester` (high) - 인증 라우트 테스트
 
+### 8. research
+
+**목적**: 공식 자료 조사 및 신뢰성 있는 정보 수집
+
+**스킬** (1개):
+- `official-research` (high) - 공식 문서 및 신뢰할 수 있는 출처 조사
+
+**특징**:
+- 공식 문서 우선 검색
+- 출처 신뢰성 검증
+- 최신 정보 확인
+
 ---
 
 ## 🔧 플러그인 개발
@@ -208,7 +259,7 @@ mkdir -p plugins/new-plugin/{.claude-plugin,skills,commands,agents}
 cat > plugins/new-plugin/.claude-plugin/plugin.json <<EOF
 {
   "name": "new-plugin",
-  "version": "2.0.0",
+  "version": "0.0.1",
   "description": "Plugin description",
   "author": {
     "name": "Your Name",
@@ -272,33 +323,22 @@ node tests/validate-skill-rules.js
 
 ---
 
+<!--
 ## 🔄 마이그레이션 (v1.x → v2.0.0)
 
-### 주요 변경사항
-
-| 항목 | v1.x | v2.0.0 |
-|------|------|--------|
-| 구조 | 단일 플러그인 | 7개 독립 플러그인 |
-| 빌드 | `src/` → `plugin/` | 직접 Git 추적 |
-| skill-rules | 단일 파일 | 플러그인별 분할 |
-| 버전 | 통합 관리 | 플러그인별 관리 |
-
-### 마이그레이션 스크립트 (참고용)
-
-```bash
-# 자동 마이그레이션 (이미 완료됨)
-bash scripts/migrate-to-multi-plugin.sh
-```
+v0.0.1 pre-release 단계에서는 마이그레이션이 필요하지 않습니다.
+정식 릴리스 시 해당 섹션이 추가될 예정입니다.
+-->
 
 ---
 
 ## 📊 통계
 
-- **24개 스킬** (20개 등록 + 4개 unregistered)
+- **25개 스킬** (20개 등록 + 5개 unregistered)
 - **4개 슬래시 커맨드**
 - **3개 에이전트**
 - **3개 전역 훅**
-- **7개 독립 플러그인**
+- **9개 독립 플러그인** (+ 1개 메타 플러그인)
 
 ---
 

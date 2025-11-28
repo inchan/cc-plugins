@@ -9,7 +9,7 @@ Claude Code용 모듈형 플러그인 마켓플레이스 - 워크플로우 자�
 
 ## 🚀 Multi-Plugin Architecture (Pre-release)
 
-anthropics/claude-code 패턴을 따라 **8개 독립 플러그인**으로 구성됩니다.
+anthropics/claude-code 패턴을 따라 **10개 플러그인** (9개 + 1개 메타)으로 구성됩니다.
 
 > **⚠️ Pre-release**: 현재 v0.0.1 개발 버전입니다. 정식 릴리스는 v1.0.0부터 시작됩니다.
 
@@ -25,8 +25,10 @@ anthropics/claude-code 패턴을 따라 **8개 독립 플러그인**으로 구�
 | [ai-integration](plugins/ai-integration) | 3 Skills | 외부 AI CLI 통합 | [README](plugins/ai-integration/README.md) |
 | [prompt-enhancement](plugins/prompt-enhancement) | 2 Skills | 메타 프롬프트 생성 | [README](plugins/prompt-enhancement/README.md) |
 | [utilities](plugins/utilities) | 1 Skill | 유틸리티 도구 | [README](plugins/utilities/README.md) |
+| [research](plugins/research) | 1 Skill | 공식 자료 조사 | [README](plugins/research/README.md) |
+| [**install-all**](plugins/install-all) | **Meta** | **모든 플러그인 통합 설치** | [README](plugins/install-all/README.md) |
 
-**총계**: 24 스킬, 4 커맨드, 3 에이전트, 3 훅
+**총계**: 25 스킬, 4 커맨드, 3 에이전트, 3 훅 (10개 플러그인: 9개 + 1개 메타)
 
 ---
 
@@ -34,20 +36,52 @@ anthropics/claude-code 패턴을 따라 **8개 독립 플러그인**으로 구�
 
 ### 설치 방법
 
+#### 옵션 1: 전체 설치 (권장)
+
 ```bash
 # 1. 레포지토리 클론
 git clone https://github.com/inchan/cc-skills.git
 
-# 2. Claude Code에서 마켓플레이스로 추가
+# 2. install-all 플러그인 설치 (모든 기능 포함)
+claude plugins install /path/to/cc-skills/plugins/install-all
+
+# 또는 마켓플레이스 추가 (전체 접근)
 # Settings → Plugins → Add Marketplace
 # Path: /path/to/cc-skills
 ```
 
-### 선택적 설치
+#### 옵션 2: 선택적 설치
 
-필요한 플러그인만 선택적으로 활성화 가능:
-- Workflow automation만 필요? → `workflow-automation` 플러그인만 활성화
-- 개발 가이드만? → `dev-guidelines` 플러그인만 활성화
+필요한 플러그인만 개별 설치:
+
+```bash
+# Workflow automation만 필요한 경우
+claude plugins install /path/to/cc-skills/plugins/workflow-automation
+
+# 개발 가이드만 필요한 경우
+claude plugins install /path/to/cc-skills/plugins/dev-guidelines
+```
+
+#### install-all 메타 플러그인
+
+`install-all`을 설치하면 모든 플러그인의 기능을 한 번에 사용할 수 있습니다:
+
+- ✅ **Hooks**: 스킬 자동 활성화
+- ✅ **Skills**: 9개 플러그인 = 25개 스킬
+  - **workflow-automation**: 워크플로우 자동화 (7개 스킬)
+  - **dev-guidelines**: 개발 가이드라인 (3개 스킬)
+  - **tool-creators**: 도구 생성 (6개 스킬)
+  - **quality-review**: 품질 리뷰 (2개 스킬)
+  - **ai-integration**: AI 통합 (3개 스킬)
+  - **prompt-enhancement**: 프롬프트 최적화 (2개 스킬)
+  - **utilities**: 유틸리티 (1개 스킬)
+  - **research**: 공식 자료 조사 (1개 스킬)
+- ✅ **Commands**: 4개 슬래시 커맨드
+- ✅ **Agents**: 3개 서브에이전트
+
+**작동 원리**: 상대 경로를 통해 다른 플러그인의 리소스를 참조하므로, 실제 파일 중복 없이 모든 기능에 접근합니다.
+
+> ⚠️ **주의**: 상대 경로 참조는 실험적 기능입니다. 작동하지 않을 경우 개별 플러그인을 설치하세요.
 
 ---
 
@@ -139,7 +173,16 @@ plugins/
 ├── quality-review/         # 품질 리뷰
 ├── ai-integration/         # AI 통합
 ├── prompt-enhancement/     # 프롬프트 최적화
-└── utilities/              # 유틸리티
+├── utilities/              # 유틸리티
+├── research/               # 공식 자료 조사
+└── install-all/            # 🎯 메타 플러그인
+    ├── .claude-plugin/
+    │   └── plugin.json    # 상대 경로로 모든 플러그인 참조
+    └── README.md
+
+scripts/
+├── update-install-all.js   # install-all 자동 업데이트
+└── analyze-dependencies.js
 
 .claude-plugin/
 └── marketplace.json        # 마켓플레이스 메타데이터
@@ -155,6 +198,19 @@ plugins/
 ---
 
 ## 🛠️ 개발
+
+### install-all 플러그인 관리
+
+```bash
+# install-all plugin.json 자동 업데이트
+node scripts/update-install-all.js
+
+# 미리보기 (파일 수정 안 함)
+node scripts/update-install-all.js --dry-run --verbose
+
+# 새 플러그인을 추가하거나 기존 플러그인을 수정한 후 실행
+# 자동으로 모든 플러그인의 리소스를 스캔하여 상대 경로로 통합
+```
 
 ### 의존성 분석
 
@@ -181,6 +237,9 @@ EOF
 
 # 3. marketplace.json 업데이트
 # .claude-plugin/marketplace.json에 플러그인 추가
+
+# 4. install-all 자동 업데이트
+node scripts/update-install-all.js
 ```
 
 ### 테스트

@@ -42,13 +42,33 @@ fi
 echo "Checking SKILL.md files in: $SKILLS_DIR"
 echo ""
 
+# Deprecated skills (excluded from validation)
+DEPRECATED_SKILLS="agent-workflow-orchestrator"
+
 # Check each file
 while IFS= read -r skill_file; do
     # Get relative path
     rel_path="${skill_file#$PLUGIN_ROOT/}"
 
+    # Check if deprecated
+    is_deprecated=false
+    for dep in $DEPRECATED_SKILLS; do
+        if [[ "$skill_file" == *"$dep"* ]]; then
+            is_deprecated=true
+            break
+        fi
+    done
+
     # Count lines (excluding empty lines at end)
     line_count=$(wc -l < "$skill_file" | tr -d ' ')
+
+    # Skip deprecated with notice
+    if $is_deprecated; then
+        echo -e "${YELLOW}⏭ SKIP${NC}     $rel_path"
+        echo "  Lines: $line_count (DEPRECATED - excluded from validation)"
+        echo ""
+        continue
+    fi
 
     # Calculate percentage
     percentage=$((line_count * 100 / LINE_LIMIT))

@@ -1,390 +1,134 @@
-# Skill Activation Hook Tests
+# 스킬 추천 시스템 테스트
 
-Comprehensive test suite for the skill activation hook system.
+이 디렉토리는 `skill-recommend-hook.py`의 자동화된 테스트를 포함합니다.
 
-## Test Scripts
+## 📋 테스트 파일 구조
 
-### 1. test-global-discovery.sh
-**Purpose**: Tests plugin and skill discovery functions
+```
+tests/
+├── README.md                          # 이 파일
+├── fixtures/
+│   └── test-prompts.json              # 테스트 케이스 정의 (26개)
+├── run-skill-recommend-tests.py       # 기본 테스트 러너
+├── detailed-test-runner.py            # 상세 분석 테스트 러너
+├── SKILL-RECOMMEND-TEST-REPORT.md     # 최종 테스트 리포트
+└── test-skill-recommend.sh            # Bash 래퍼 스크립트
+```
 
-**Tests**:
-- ✅ Discover installed plugins from `~/.claude/plugins/`
-- ✅ Find SKILL.md files in plugin directories
-- ✅ Locate skill-rules.json files
-- ✅ Handle missing/malformed plugin structures
-- ✅ Performance: < 100ms
+## 🚀 테스트 실행 방법
 
-**Usage**:
+### 1. 기본 테스트 실행
 ```bash
-./test-global-discovery.sh
+# plugins/hooks/tests 디렉토리에서
+python3 run-skill-recommend-tests.py
 ```
 
-### 2. test-yaml-parsing.sh
-**Purpose**: Tests YAML frontmatter and metadata parsing
-
-**Tests**:
-- ✅ Parse standard YAML frontmatter
-- ✅ Handle multiline descriptions
-- ✅ Handle missing fields gracefully
-- ✅ Support Korean (UTF-8) characters
-- ✅ Parse skill-rules.json
-- ✅ Aggregate metadata from YAML + JSON
-- ✅ Performance: < 50ms
-
-**Usage**:
+### 2. 상세 분석 테스트 실행
 ```bash
-./test-yaml-parsing.sh
+# 키워드, 신뢰도, 매칭 패턴 분석 포함
+python3 detailed-test-runner.py
 ```
 
-### 3. test-plugin-discovery.sh
-**Purpose**: Tests plugin and skill discovery functions
-
-**Tests**:
-- ✅ Discover installed plugins
-- ✅ Find SKILL.md files in plugins
-- ✅ Verify output format (plugin|skill|path)
-- ✅ Check SKILL.md file existence
-- ✅ Multiple plugins discovery
-- ✅ Empty directory handling
-- ✅ Performance: < 1000ms
-
-**Usage**:
+### 3. Bash 스크립트 사용
 ```bash
-./test-plugin-discovery.sh
+bash test-skill-recommend.sh
 ```
 
-### 4. test-metadata-parser.sh
-**Purpose**: Tests YAML frontmatter and metadata parsing
+## 📊 테스트 케이스 구성
 
-**Tests**:
-- ✅ Parse YAML frontmatter from SKILL.md
-- ✅ Parse skill-rules.json
-- ✅ Aggregate skill metadata (pipe-separated)
-- ✅ Handle missing frontmatter
-- ✅ Handle malformed JSON
-- ✅ Extract keywords from combined sources
-- ✅ Output format validation
-- ✅ Performance: < 10ms per parse
+### 카테고리별 테스트 수
+- **frontend**: 3개
+- **backend**: 3개
+- **error-handling**: 2개
+- **workflow**: 3개
+- **tool-creation**: 4개
+- **quality**: 3개
+- **research**: 2개
+- **ai-integration**: 2개
+- **testing**: 2개
+- **prompt**: 2개
 
-**Usage**:
-```bash
-./test-metadata-parser.sh
+**총 26개 테스트 케이스**
+
+### 테스트 케이스 형식
+
+```json
+{
+  "id": "frontend-1",
+  "prompt": "React 컴포넌트를 만들고 싶어요",
+  "expectedSkills": ["frontend-dev-guidelines"],
+  "mustMatch": ["frontend-dev-guidelines"],
+  "mustNotMatch": ["backend-dev-guidelines"]
+}
 ```
 
-### 5. test-cache-manager.sh
-**Purpose**: Tests cache management functions
-
-**Tests**:
-- ✅ Cache directory initialization
-- ✅ Write and read cache
-- ✅ Cache validity check (fresh)
-- ✅ Cache validity check (stale)
-- ✅ File change detection
-- ✅ Cache update
-- ✅ Multiple source files check
-- ✅ Cache expiration (age-based)
-- ✅ Missing cache file handling
-- ✅ Concurrent access
-- ✅ Performance: < 5ms per operation
-
-**Usage**:
-```bash
-./test-cache-manager.sh
-```
-
-### 6. test-synonym-expansion.sh
-**Purpose**: Tests synonym expansion and matching
-
-**Tests**:
-- ✅ Load synonyms.json
-- ✅ Check file exists
-- ✅ Verify JSON structure
-- ✅ Count categories
-- ✅ Keyword expansion
-- ✅ Unknown keyword handling
-- ✅ Performance: < 20ms per expansion
-
-**Usage**:
-```bash
-./test-synonym-expansion.sh
-```
-
-### 7. test-tfidf-matching.sh
-**Purpose**: Tests TF-IDF based skill matching
-
-**Tests**:
-- ✅ Verify tfidf-matcher.js exists
-- ✅ Check Node.js availability
-- ✅ Basic TF-IDF matching
-- ✅ Score calculation
-- ✅ Ranking order
-- ✅ Empty prompt handling
-- ✅ No matching skills
-- ✅ Multiple keyword overlap
-- ✅ JSON output format
-- ✅ Performance: < 100ms
-
-**Dependencies**:
-- Node.js v14+
-- npm packages: (see matchers/package.json)
-
-**Usage**:
-```bash
-cd ../matchers && npm install
-./test-tfidf-matching.sh
-```
-
-### 8. test-semantic-matching.sh
-**Purpose**: Tests semantic matching with embeddings
-
-**Tests**:
-- ✅ Verify semantic-matcher.py exists
-- ✅ Check Python availability
-- ✅ Check Python dependencies
-- ✅ Basic semantic matching
-- ✅ Korean prompt support
-- ✅ Similarity score calculation
-- ✅ Empty prompt handling
-- ✅ JSON output format
-- ✅ Model caching
-- ✅ Performance: < 350ms (after model load)
-
-**Dependencies**:
-- Python 3.8+
-- pip packages: `sentence-transformers`, `numpy`
-
-**Usage**:
-```bash
-cd ../matchers && pip install -r requirements.txt
-./test-semantic-matching.sh
-```
-
-### 9. benchmark-performance.sh
-**Purpose**: Comprehensive performance benchmarking
-
-**Benchmarks**:
-- **Tier 1 (Exact)**: Exact keyword matching
-- **Tier 2 (TF-IDF)**: Statistical matching
-- **Tier 3 (Semantic)**: Embedding similarity
-- **End-to-end**: Full discovery workflow
-- **Cache Operations**: Read/write performance
-- **Metadata Parsing**: YAML + JSON parsing
-
-**Test Scales**:
-- 10 skills, 50 skills, 100 skills
-
-**Metrics**:
-- Average time per operation
-- Total duration
-- Performance report (JSON)
-
-**Targets**:
-- Tier 1: < 10ms
-- Tier 2: < 100ms
-- Tier 3: < 350ms
-- End-to-end: < 200ms
-
-**Usage**:
-```bash
-./benchmark-performance.sh
-```
-
-## Running All Tests
-
-```bash
-# Make scripts executable
-chmod +x *.sh
-
-# Run all tests
-./run-all-tests.sh
-```
-
-## Test Output Format
-
-All tests follow a consistent output format:
-
-```
-============================================
-Test Name
-============================================
-
-  [TEST] Test case description ... PASS
-  [TEST] Another test case ... FAIL
-    Error: Detailed error message
-
-============================================
-Test Summary
-============================================
-
-  Total:  10
-  Passed: 9
-  Failed: 1
-
-✓ ALL TESTS PASSED  (or ✗ TESTS FAILED)
-```
-
-## Test Fixtures
-
-Tests create temporary fixtures in `./fixtures/` directory:
-- Mock plugin structures
-- Sample SKILL.md files
-- Test skill-rules.json
-- Benchmark test data
-
-Fixtures are automatically cleaned up after each test.
-
-## CI/CD Integration
-
-### GitHub Actions Example
-
-```yaml
-name: Test Skill Activation Hooks
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          cd plugins/hooks/matchers
-          npm install
-          pip install -r requirements.txt
-
-      - name: Run tests
-        run: |
-          cd plugins/hooks/tests
-          chmod +x *.sh
-          ./run-all-tests.sh
-```
-
-## Performance Expectations
-
-| Component | Target | Test Scale | Notes |
-|-----------|--------|------------|-------|
-| Plugin Discovery | < 1000ms | All plugins | Depends on plugin count |
-| Metadata Parsing | < 10ms | Per skill | YAML + JSON parsing |
-| Cache Operations | < 5ms | Per operation | Read/write |
-| Synonym Expansion | < 20ms | Per expansion | With jq |
-| TF-IDF Matching | < 100ms | 10-100 skills | Node.js required |
-| Semantic Matching | < 350ms | 10-50 skills | After model load |
-| End-to-end | < 200ms | Full pipeline | Discovery + matching |
-
-## Troubleshooting
-
-### Tests Failing: Node.js not found
-
-**Solution**:
-```bash
-# macOS
-brew install node
-
-# Ubuntu
-apt-get install nodejs npm
-```
-
-### Tests Failing: Python dependencies
-
-**Solution**:
-```bash
-cd plugins/hooks/matchers
-pip3 install -r requirements.txt
-```
-
-### Tests Failing: jq not found
-
-**Solution**:
-```bash
-# macOS
-brew install jq
-
-# Ubuntu
-apt-get install jq
-```
-
-### Semantic Matcher Slow on First Run
-
-**Expected**: First run loads the sentence-transformers model (~100MB download + initialization)
-
-**Solution**: Run once to cache model:
-```bash
-cd plugins/hooks/matchers
-python3 semantic-matcher.py --test
-```
-
-### Permission Denied
-
-**Solution**:
-```bash
-chmod +x plugins/hooks/tests/*.sh
-```
-
-## Development Workflow
-
-### Adding New Tests
-
-1. Create `test-new-feature.sh`
-2. Follow existing test structure:
-   - Setup fixtures
-   - Define test functions
-   - Print summary
-   - Cleanup
-3. Add to `run-all-tests.sh`
-4. Update this README
-
-### Test-Driven Development
-
-```bash
-# Watch mode (re-run on file change)
-watch -n 2 ./test-tfidf-ranking.sh
-
-# Run specific test
-./test-yaml-parsing.sh
-
-# Run with verbose output
-bash -x ./test-global-discovery.sh
-```
-
-## Contributing
-
-When adding new functionality to the skill activation hook:
-
-1. Write tests first
-2. Ensure tests pass locally
-3. Add performance benchmarks if applicable
-4. Update documentation
-
-## Version History
-
-### v2.0.0 (2025-11-24)
-- ✅ Complete test suite overhaul
-- ✅ 9 comprehensive test scripts
-- ✅ New tests: plugin-discovery, metadata-parser, cache-manager
-- ✅ Performance benchmarking
-- ✅ CI/CD ready
-
-### v1.0.0 (2025-11-23)
-- ✅ Initial test suite
-- ✅ Basic functionality tests
-
-## License
-
-MIT License
-
-## Author
-
-**inchan** - [GitHub](https://github.com/inchan)
+#### 필드 설명
+- `id`: 테스트 케이스 고유 식별자
+- `prompt`: 테스트할 사용자 프롬프트
+- `expectedSkills`: 기대되는 스킬 목록 (참고용)
+- `mustMatch`: **반드시** 매칭되어야 하는 스킬 (테스트 성공 조건)
+- `mustNotMatch`: **절대** 매칭되면 안 되는 스킬 (테스트 실패 조건)
+
+## ✅ 성공 기준
+
+테스트는 다음 조건을 **모두** 만족해야 통과합니다:
+1. `mustMatch`의 모든 스킬이 매칭 결과에 포함
+2. `mustNotMatch`의 모든 스킬이 매칭 결과에서 제외
+
+## 📈 최근 테스트 결과
+
+**실행 시각**: 2025-11-27 16:37:35
+
+- **총 테스트**: 26개
+- **성공**: 26개 (100.0%)
+- **실패**: 0개 (0.0%)
+- **평균 매칭 수**: 1.3개/테스트
+
+상세 결과는 [`SKILL-RECOMMEND-TEST-REPORT.md`](./SKILL-RECOMMEND-TEST-REPORT.md)를 참조하세요.
+
+## 🔧 새 테스트 케이스 추가 방법
+
+1. `fixtures/test-prompts.json` 열기
+2. 해당 카테고리에 새 테스트 추가:
+   ```json
+   {
+     "id": "category-N",
+     "prompt": "테스트할 프롬프트",
+     "expectedSkills": ["skill-name"],
+     "mustMatch": ["skill-name"],
+     "mustNotMatch": ["unwanted-skill"]
+   }
+   ```
+3. 테스트 실행하여 검증
+4. 결과 확인 및 필요시 키워드 조정
+
+## 🐛 문제 해결
+
+### 테스트 실패 시
+1. **SKILL-RECOMMEND-TEST-REPORT.md** 에서 실패 케이스 확인
+2. **실패 이유** 분석:
+   - `mustMatch 누락`: 키워드 추가 필요
+   - `mustNotMatch 포함`: 키워드 너무 일반적, 제거 고려
+3. 해당 스킬의 `skill-metadata.json` 또는 `skill.json` 수정
+4. 캐시 갱신 후 재테스트
+
+### JSON 파싱 오류
+- `test-prompts.json` 문법 검증: `python3 -m json.tool fixtures/test-prompts.json`
+
+### 실행 오류
+- Python3 설치 확인: `python3 --version`
+- 스크립트 실행 권한: `chmod +x *.py`
+
+## 📝 커밋 전 체크리스트
+
+새 스킬이나 키워드를 추가/수정한 경우:
+- [ ] 테스트 케이스 추가/업데이트
+- [ ] `python3 detailed-test-runner.py` 실행
+- [ ] 모든 테스트 통과 확인
+- [ ] 리포트 검토 및 커밋
+
+## 🔗 관련 문서
+
+- [skill-recommend-hook.py](../skill-recommend-hook.py) - 훅 구현체
+- [skill-metadata.json](../../cache/skill-metadata.json) - 스킬 메타데이터 캐시
+- [hooks.json](../hooks.json) - 훅 설정

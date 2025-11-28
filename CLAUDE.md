@@ -3,7 +3,7 @@
 ---
 version: 0.0.1
 status: pre-release
-last_updated: 2025-11-25
+last_updated: 2025-11-26
 ---
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Multi-Plugin Architecture (Pre-release)
 
-이 프로젝트는 anthropics/claude-code 패턴을 따라 **8개 독립 플러그인**으로 구성됩니다.
+이 프로젝트는 anthropics/claude-code 패턴을 따라 **10개 독립 플러그인**으로 구성됩니다.
 
 ### 플러그인 목록
 
@@ -26,8 +26,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | **ai-integration** | 3 Skills | 외부 AI CLI 통합 (codex, qwen, aider 등) |
 | **prompt-enhancement** | 2 Skills | 메타 프롬프트 생성, 프롬프트 최적화 |
 | **utilities** | 1 Skill | 유틸리티 도구 (route-tester) |
+| **research** | 1 Skill | 공식 자료 조사 및 신뢰성 있는 정보 수집 |
+| **install-all** | Meta | 모든 플러그인 통합 설치 (상대 경로 참조) |
 
-**총계**: 24 스킬, 4 커맨드, 3 에이전트, 3 훅
+**총계**: 25 스킬, 4 커맨드, 3 에이전트, 3 훅 (**10개 플러그인**: 9개 + 1개 메타)
 
 ### 디렉토리 구조
 
@@ -62,11 +64,18 @@ plugins/
 ├── prompt-enhancement/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/ (2개)
-└── utilities/
+├── utilities/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/ (1개)
+├── research/               # 공식 자료 조사
+│   ├── .claude-plugin/plugin.json
+│   └── skills/ (1개)
+└── install-all/            # 🎯 메타 플러그인
     ├── .claude-plugin/plugin.json
-    └── skills/ (1개)
+    └── README.md
 
 scripts/                    # 유틸리티 스크립트
+├── update-install-all.js   # install-all 자동 업데이트
 .claude-plugin/             # Marketplace 메타데이터
     └── marketplace.json
 ```
@@ -94,6 +103,18 @@ bash scripts/migrate-to-multi-plugin.sh
 
 # skill-rules.json 플러그인별 분할
 node scripts/split-skill-rules.js
+```
+
+### install-all Plugin Management
+```bash
+# install-all plugin.json 자동 업데이트
+node scripts/update-install-all.js
+
+# 미리보기 (파일 수정 안 함)
+node scripts/update-install-all.js --dry-run --verbose
+
+# 모든 플러그인의 리소스를 스캔하여 상대 경로로 통합
+# 자동으로 backup 생성 (.claude-plugin/plugin.json.backup)
 ```
 
 ### Plugin Development

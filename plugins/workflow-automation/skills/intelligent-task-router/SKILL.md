@@ -3,6 +3,15 @@ name: intelligent-task-router
 description: Implements Anthropic's Routing pattern to classify incoming tasks and direct them to specialized handlers. Analyzes task complexity, intent, and category to select optimal processing path and model (Haiku/Sonnet/Opus). Use as the entry point for complex requests requiring intelligent dispatch.
 ---
 
+<!--
+⚠️ COMPLEXITY LOGIC GUARD
+이 복잡도 로직은 advisor와 의도적으로 분리되어 있습니다.
+- Router: 복잡도 → 모델 선택 (Haiku < 0.4 < Sonnet < 0.7 < Opus)
+- Advisor: 구조 우선, 복잡도는 보조 (tie-breaker)
+통합하려면 먼저 docs/complexity-logic-philosophy.md를 검토하세요.
+임계값 변경 시 tests/complexity-pinning.test.js 테스트 업데이트 필수.
+-->
+
 # Intelligent Task Router (Routing Pattern)
 
 ## Overview
@@ -59,28 +68,12 @@ This skill implements the **Routing** workflow pattern from Anthropic's "Buildin
 
 Analyze each incoming task across **4 dimensions**:
 
-```markdown
-## Task Classification: [Task Description]
+1. **Category Analysis**: Primary/Secondary categories, confidence level
+2. **Intent Detection**: CREATE/MODIFY/DEBUG/ANALYZE/OPTIMIZE/DOCUMENT/TEST
+3. **Complexity Assessment**: Scope, Dependencies, Technical Depth (0.0-1.0)
+4. **Urgency Level**: Priority and time sensitivity
 
-### 1. Category Analysis
-**Primary Category**: [one of 8 categories]
-**Secondary Categories**: [supporting categories]
-**Confidence**: [0-100%]
-
-### 2. Intent Detection
-**User Intent**: [CREATE/MODIFY/DEBUG/ANALYZE/OPTIMIZE/DOCUMENT/TEST]
-**Underlying Goal**: [what the user ultimately wants to achieve]
-
-### 3. Complexity Assessment
-**Scope**: [single file / multiple files / system-wide]
-**Dependencies**: [none / few / many]
-**Technical Depth**: [basic / intermediate / advanced]
-**Overall Complexity**: [0.0 - 1.0]
-
-### 4. Urgency Level
-**Priority**: [critical / high / medium / low]
-**Time Sensitivity**: [immediate / soon / eventual]
-```
+**Detailed Complexity Analysis**: See [`resources/complexity-analysis-guide.md`](resources/complexity-analysis-guide.md) for comprehensive methodology, calculation formulas, and examples.
 
 ### Step 2: Category Classification
 
@@ -132,32 +125,13 @@ Based on classification, select:
 
 #### B. Model Selection
 
-**Cost-Optimized Model Selection:**
+**Model Selection by Complexity:**
 
-```markdown
-## Model Selection Matrix
+- **Claude Haiku (< 0.4)**: Simple tasks, fastest/cheapest
+- **Claude Sonnet (0.4-0.7)**: Balanced, most tasks (DEFAULT)
+- **Claude Opus (> 0.7)**: Complex architecture, security-critical
 
-### Claude Haiku (complexity < 0.4)
-- Simple documentation updates
-- Basic data transformations
-- Straightforward bug fixes
-- Quick information retrieval
-**Trade-off**: Fastest, cheapest, less capable
-
-### Claude Sonnet (complexity 0.4-0.7)
-- Standard feature development
-- Medium complexity refactoring
-- Most testing tasks
-- Performance analysis
-**Trade-off**: Balanced performance and cost (DEFAULT)
-
-### Claude Opus (complexity > 0.7)
-- Complex architecture design
-- Security-critical implementations
-- Large-scale system migrations
-- Novel problem solving
-**Trade-off**: Most capable, slowest, most expensive
-```
+**Detailed Model Selection Guide**: See [`resources/complexity-analysis-guide.md`](resources/complexity-analysis-guide.md) for decision criteria and examples.
 
 ## Complete Routing Example
 
@@ -188,22 +162,12 @@ Based on classification, select:
 **Underlying Goal**: Enable users to personalize profiles with images
 
 ### 3. Complexity Assessment
-**Scope**: Multiple components
-- Frontend: Upload UI, crop interface
-- Backend: Upload handling, image processing
-- Infrastructure: S3 integration
-
-**Dependencies**: High
-- S3 AWS SDK
-- Image processing library (Sharp/ImageMagick)
-- Database schema updates
-
-**Technical Depth**: Advanced
-- Image manipulation algorithms
-- Cloud storage patterns
-- Async processing for thumbnails
-
+**Scope**: Multiple components (Frontend + Backend + Infrastructure)
+**Dependencies**: High (S3, image processing library, database)
+**Technical Depth**: Advanced (image algorithms, cloud patterns, async processing)
 **Overall Complexity**: 0.78 (High)
+
+**Calculation Details**: See [`resources/complexity-analysis-guide.md`](resources/complexity-analysis-guide.md) for detailed scoring methodology.
 
 ### 4. Urgency Level
 **Priority**: Medium

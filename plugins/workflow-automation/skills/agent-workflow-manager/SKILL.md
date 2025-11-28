@@ -115,200 +115,53 @@ description: Agent Skills 통합 워크플로우를 자동으로 관리하고 �
 
 이 스킬이 활성화되면 다음과 같이 자동으로 진행합니다:
 
-#### 1단계: 요청 분석
-
-```bash
-# 사용자 요청 파싱
-USER_REQUEST="${입력}"
-
-# Task ID 생성
-TASK_ID=$(uuidgen)
-echo "🚀 Workflow 시작: ${TASK_ID}"
-
-# 프로젝트 ID 생성 (복잡한 워크플로우용)
-PROJECT_ID="project_${TASK_ID}"
-```
+#### 1단계: 요청 분석 및 Task ID 생성
+- 사용자 요청 파싱
+- 고유 Task ID 생성 (Simple/Parallel) 또는 Project ID 생성 (Complex)
 
 #### 2단계: 워크플로우 패턴 선택
 
-```markdown
-## 분석 기준:
-
-1. **키워드 분석**
-   - "버그", "수정" → Simple
-   - "테스트", "병렬", "동시" → Parallel
-   - "전체", "프로젝트", "마이그레이션" → Complex
-
-2. **복잡도 추정**
-   - 단일 파일/기능 → Simple
-   - 다중 독립 작업 → Parallel
-   - 다중 컴포넌트/통합 → Complex
-
-3. **의존성 분석**
-   - 순차 의존 → Simple
-   - 독립 병렬 → Parallel
-   - 복잡한 의존성 → Complex
-
-선택된 패턴: ${WORKFLOW_PATTERN}
-```
+**분석 기준:**
+- **키워드 분석**: "버그/수정" → Simple, "테스트/병렬" → Parallel, "전체/프로젝트" → Complex
+- **복잡도 추정**: 단일 파일 → Simple, 다중 독립 → Parallel, 다중 통합 → Complex
+- **의존성 분석**: 순차 → Simple, 독립 → Parallel, 복잡 → Complex
 
 #### 3단계: 워크플로우 실행
 
-**Simple Workflow:**
+각 패턴마다 Router → 메인 스킬 → Evaluator 순서로 실행하며, 단계별로 다음 명령어를 안내합니다.
 
-```bash
-echo "📍 Simple Workflow 실행"
-
-# Step 1: Router
-echo "🔄 [1/3] Router로 classification..."
-.agent_skills/scripts/send_message.sh router sequential execute_task ${TASK_ID} '{...}'
-
-# 진행 상황 표시
-echo "   ✓ Category: ${CATEGORY}"
-echo "   ✓ Complexity: ${COMPLEXITY}"
-echo "   ✓ Target: Sequential"
-
-echo ""
-echo "💡 다음 명령어를 실행하세요:"
-echo "   'Sequential 스킬을 사용해서 ${TASK_ID} 작업을 처리해줘'"
-echo ""
-
-# Step 2: Sequential (사용자가 위 명령 실행 후)
-echo "🔄 [2/3] Sequential 처리 중..."
-# Sequential 스킬이 메시지 확인 및 처리
-
-echo ""
-echo "💡 다음 명령어를 실행하세요:"
-echo "   'Evaluator 스킬로 ${TASK_ID} 작업을 평가해줘'"
-echo ""
-
-# Step 3: Evaluator (사용자가 위 명령 실행 후)
-echo "🔄 [3/3] Evaluator 평가 중..."
-# Evaluator 스킬이 평가 수행
-
-echo "✅ Simple Workflow 완료!"
-```
-
-**Parallel Workflow:**
-
-```bash
-echo "📍 Parallel Workflow 실행"
-
-# Step 1: Router
-echo "🔄 [1/3] Router로 병렬 가능 여부 판단..."
-.agent_skills/scripts/send_message.sh router parallel execute_task ${TASK_ID} '{...}'
-
-# Step 2: Parallel
-echo ""
-echo "💡 다음 명령어를 실행하세요:"
-echo "   'Parallel 스킬로 ${TASK_ID} 작업을 병렬 처리해줘'"
-
-# Step 3: Evaluator
-echo ""
-echo "💡 Parallel 완료 후 실행하세요:"
-echo "   'Evaluator로 병렬 결과를 집계하고 평가해줘'"
-
-echo "✅ Parallel Workflow 완료!"
-```
-
-**Complex Workflow:**
-
-```bash
-echo "📍 Complex Workflow 실행"
-
-# Step 1: Router
-echo "🔄 [1/3] Router로 프로젝트 분석..."
-.agent_skills/scripts/send_message.sh router orchestrator execute_task ${TASK_ID} '{...}'
-
-# Step 2: Orchestrator
-echo ""
-echo "💡 다음 명령어를 실행하세요:"
-echo "   'Orchestrator 스킬로 ${PROJECT_ID} 프로젝트를 조율해줘'"
-
-# Orchestrator가 워커들 조율...
-
-# Step 3: Evaluator
-echo ""
-echo "💡 Orchestrator 완료 후 실행하세요:"
-echo "   'Evaluator로 전체 프로젝트를 종합 평가해줘'"
-
-echo "✅ Complex Workflow 완료!"
-```
+**상세 실행 가이드**: `resources/workflow-execution-details.md` 참조
 
 #### 4단계: 진행 상황 모니터링
 
 ```bash
-# 메시지 큐 상태 확인
+# 메시지 큐 확인
 .agent_skills/scripts/check_messages.sh
 
 # 로그 확인
 tail -f .agent_skills/logs/$(date +%Y%m%d).log | grep ${TASK_ID}
-
-# 프로젝트 상태 확인 (Complex만)
-cat .agent_skills/shared_context/projects/${PROJECT_ID}/state.json
 ```
 
 ## 📊 진행 상황 리포팅
 
 ### 실시간 상태 표시
 
-각 단계마다 다음 정보를 표시합니다:
-
-```
-╔══════════════════════════════════════════════════════╗
-║  Workflow Progress: ${TASK_ID}                      ║
-╚══════════════════════════════════════════════════════╝
-
-패턴: ${WORKFLOW_PATTERN}
-진행도: [████████░░░░] 65% (Step 2/3)
-
-✓ Router: Classification 완료
-  • Category: ${CATEGORY}
-  • Complexity: ${COMPLEXITY}
-  • Target: ${TARGET_SKILL}
-
-🔄 Sequential: 처리 중...
-  • Step 1/5: Requirements ✓
-  • Step 2/5: Design ✓
-  • Step 3/5: Implementation [진행중]
-  • Step 4/5: Testing [대기]
-  • Step 5/5: Documentation [대기]
-
-⏳ Evaluator: 대기 중...
-
-예상 완료 시간: ${ETA}
-```
+각 단계마다 진행 상황을 표시합니다:
+- 워크플로우 패턴 및 진행도 (%)
+- 완료된 단계 및 현재 실행 중인 단계
+- 대기 중인 다음 단계
+- 예상 완료 시간
 
 ### 최종 리포트
 
-워크플로우 완료 시:
+워크플로우 완료 시 다음 정보를 제공합니다:
+- 실행 요약 (패턴, Task ID, 소요 시간, 사용된 스킬)
+- 단계별 소요 시간
+- 산출물 목록
+- 품질 평가 결과
+- 상세 로그 경로
 
-```
-╔══════════════════════════════════════════════════════╗
-║  Workflow 완료! 🎉                                   ║
-╚══════════════════════════════════════════════════════╝
-
-📊 실행 요약:
-   • Workflow: ${WORKFLOW_PATTERN}
-   • Task ID: ${TASK_ID}
-   • Duration: ${TOTAL_DURATION}
-   • Skills Used: ${SKILL_COUNT}개
-
-📈 단계별 소요 시간:
-   • Router: ${ROUTER_TIME}
-   • ${MAIN_SKILL}: ${MAIN_TIME}
-   • Evaluator: ${EVAL_TIME}
-
-📁 산출물:
-   ${ARTIFACTS_LIST}
-
-📊 품질 평가:
-   • Total Score: ${TOTAL_SCORE}/1.0
-   • Status: ${STATUS}
-
-📝 상세 로그:
-   .agent_skills/logs/$(date +%Y%m%d).log
-```
+**상세 템플릿**: `resources/reporting-templates.md` 참조
 
 ## 🛠️ 헬퍼 스크립트
 
@@ -395,40 +248,15 @@ fi
 ## 🎓 사용 예시
 
 ### 예시 1: 버그 수정 (Simple)
-
-```
-사용자: "로그인 버튼 클릭 시 에러 수정"
-
-Workflow Manager:
-  1. 분석: Simple Workflow 선택
-  2. Router 실행 → Sequential 호출 가이드
-  3. Sequential 실행 → Evaluator 호출 가이드
-  4. Evaluator 평가 → 완료
-```
+- Simple Workflow 선택 → Router → Sequential → Evaluator
 
 ### 예시 2: 테스트 실행 (Parallel)
-
-```
-사용자: "전체 테스트 스위트를 병렬로 실행"
-
-Workflow Manager:
-  1. 분석: Parallel Workflow 선택
-  2. Router 실행 → Parallel 호출 가이드
-  3. Parallel 병렬 실행 → Evaluator 호출 가이드
-  4. Evaluator 집계 및 평가 → 완료
-```
+- Parallel Workflow 선택 → Router → Parallel → Evaluator
 
 ### 예시 3: 전체 스택 개발 (Complex)
+- Complex Workflow 선택 → Router → Orchestrator → Evaluator
 
-```
-사용자: "Todo 앱 전체 스택 개발"
-
-Workflow Manager:
-  1. 분석: Complex Workflow 선택
-  2. Router 실행 → Orchestrator 호출 가이드
-  3. Orchestrator 워커 조율 → 각 워커 실행
-  4. Evaluator 프로젝트 평가 → 완료
-```
+**상세 예시**: `resources/examples.md` 참조
 
 ## 🔗 통합 프로토콜
 

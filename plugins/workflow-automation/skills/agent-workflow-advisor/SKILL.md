@@ -3,6 +3,15 @@ name: agent-workflow-advisor
 description: Analyzes tasks and recommends the optimal agent pattern from Anthropic's Building Effective Agents. Provides pattern selection guidance based on task complexity, structure, and requirements. Use this as the entry point when unsure which pattern (Sequential, Router, Parallel, Orchestrator, Evaluator) fits your task best.
 ---
 
+<!--
+⚠️ COMPLEXITY LOGIC GUARD
+이 복잡도 사용은 router와 철학이 다릅니다.
+- Advisor: 구조 우선, 복잡도는 보조 (< 0.3 = No Pattern 가능)
+- Router: 복잡도 → 모델 선택 (0.4, 0.7 임계값)
+통합하려면 먼저 docs/complexity-logic-philosophy.md를 검토하세요.
+임계값 변경 시 tests/complexity-pinning.test.js 테스트 업데이트 필수.
+-->
+
 # Agent Workflow Advisor
 
 ## Overview

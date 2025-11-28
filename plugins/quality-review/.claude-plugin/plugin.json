@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "skills": ["./skills"],
-  "agents": ["./agents"]
+  "agents": ["./agents/architect.md", "./agents/code-reviewer.md"]
 }
