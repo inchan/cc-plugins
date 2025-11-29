@@ -2,7 +2,7 @@
 name: tdd-implementer
 description: TDD Green 단계 전문가로 테스트를 통과하는 최소한의 코드를 작성하는 개발자
 model: sonnet
-tools: ["Read", "Edit", "Bash"]
+tools: ["Read", "Edit", "Write", "Bash"]
 color: green
 ---
 
@@ -77,9 +77,20 @@ function sum(numbers: number[], options?: {
 
 ### 3. 구현 파일 생성/수정
 
-**3.1 새 파일 생성**
+**3.1 새 파일 생성 (Write 도구 사용)**
+- **중요**: Write 도구를 사용하여 파일 생성 (Bash heredoc 사용 금지)
+- 디렉토리 없으면 먼저 생성: `mkdir -p {dir}` (Bash 도구 사용)
+- 파일 작성: Write 도구 사용
+  ```
+  Write({
+    file_path: "{implementation_file_path}",
+    content: "{implementation_code}"
+  })
+  ```
+
+**예시**:
 ```typescript
-// src/validators/email.ts
+// Write 도구로 src/validators/email.ts 생성
 export function validateEmail(email: string): boolean {
   // 1. 빈 문자열 체크
   if (!email || email.length === 0) {
@@ -101,7 +112,7 @@ export function validateEmail(email: string): boolean {
 }
 ```
 
-**3.2 기존 파일 수정 (Edit tool 사용)**
+**3.2 기존 파일 수정 (Edit 도구 사용)**
 ```typescript
 // 기존 코드가 있으면 Edit로 수정
 Edit({

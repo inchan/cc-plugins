@@ -118,32 +118,7 @@ rules/
 
 ## 3. 프로젝트 구조 요구사항
 
-```
-cc-skills/
-├── docs/              # 문서
-│   ├── instruction.md
-│   ├── requirements.md
-│   ├── dev-guidelines.md
-│   └── TOOL-CREATION-GUIDE.md
-├── skills/            # 스킬 모음
-│   └── {skill-name}/
-│       ├── SKILL.md
-│       ├── resources/
-│       └── scripts/
-├── hooks/             # 훅 모음
-│   ├── hooks.json
-│   └── *.py|*.sh
-├── agents/            # 서브에이전트 모음
-│   └── {agent-name}.md
-├── commands/          # 커맨드 모음
-│   └── {command-name}.md
-├── rules/             # 규칙 정의
-│   └── skill-rules.json
-└── tests/             # 테스트
-    ├── skills/
-    ├── hooks/
-    └── integration/
-```
+프로젝트 구조는 [CLAUDE.md](../CLAUDE.md#참고-프로젝트-구조) 참고
 
 **요구사항**:
 - [ ] 모든 컴포넌트는 루트 디렉토리에 직접 배치
@@ -281,5 +256,6 @@ cc-skills/
 
 ## 변경 이력
 
+- **2025-11-29**: 프로젝트 구조 섹션 참조로 변환 (CLAUDE.md 참조) - 중복 제거
 - **2025-11-28**: instruction.md로부터 요구사항 도출 및 문서 생성
 - **2025-11-28**: 업데이트 흐름 및 프로세스 명시

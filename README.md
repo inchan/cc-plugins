@@ -56,19 +56,18 @@ npm run validate
 
 ```
 cc-skills/
-├── skills/                # 스킬 모음
-├── hooks/                 # 훅 모음
-├── agents/                # 서브에이전트 모음
-├── commands/              # 커맨드 모음
-├── rules/                 # 규칙 정의
-├── templates/             # 컴포넌트 템플릿
-├── docs/                  # 문서
+├── agents/                # 서브에이전트 (TDD 개발 팀 5개)
+├── commands/              # 슬래시 커맨드
+├── skills/                # 확장 스킬
+├── hooks/                 # 이벤트 훅
+├── rules/                 # 활성화 규칙
+├── docs/                  # 프로젝트 문서
 │   ├── guidelines/        # 개발 가이드라인
 │   └── references/        # 레퍼런스 패턴
 └── .claude-plugin/        # 플러그인 메타데이터
 ```
 
-각 디렉토리의 상세 구조는 해당 디렉토리의 README.md 참고
+각 디렉토리 상세 구조는 해당 디렉토리의 README.md 참고
 
 ---
 
@@ -123,6 +122,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참고
 
 ## 변경 이력
 
+- **2025-11-29**: 프로젝트 구조 직접 표기 (TDD 개발 팀 5개 반영)
+- **2025-11-29**: 프로젝트 구조 섹션 참조로 변환 (CLAUDE.md 참조)
 - **2025-11-28**: QUICK_START.md 삭제 - 마켓플레이스 설치 기반으로 불필요, 내용은 docs/references로 이동
 - **2025-11-28**: README 간소화 - 중복 제거
-- 전체 변경 사항은 [CHANGELOG.md](CHANGELOG.md) 참고

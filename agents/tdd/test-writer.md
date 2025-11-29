@@ -45,8 +45,16 @@ test_framework: "jest" | "pytest" | "go test" | "rspec"
 ### 2. 테스트 코드 작성
 
 **2.1 테스트 파일 생성**
+- **중요**: Write 도구를 사용하여 파일 생성 (Bash heredoc 사용 금지)
 - 파일 경로: Task의 `files.test` 필드 사용
-- 디렉토리 없으면 생성: `mkdir -p {dir}`
+- 디렉토리 없으면 먼저 생성: `mkdir -p {dir}` (Bash 도구 사용)
+- 파일 작성: Write 도구 사용
+  ```
+  Write({
+    file_path: "{test_file_path}",
+    content: "{test_code}"
+  })
+  ```
 
 **2.2 테스트 구조 (Jest 예시)**
 ```typescript

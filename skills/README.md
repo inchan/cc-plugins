@@ -20,54 +20,9 @@ skills/
 
 ## 스킬 생성 가이드
 
-### 1. 디렉토리 생성
-```bash
-mkdir -p skills/{skill-name}/{resources,scripts}
-```
-
-### 2. SKILL.md 작성
-
-**필수 섹션**:
-- **id**: 고유 식별자
-- **trigger**: 활성화 조건 (키워드, 패턴)
-- **description**: 스킬 설명
-- **instructions**: 실행 지시사항
-
-**예시**:
-```markdown
----
-id: example-skill
-trigger:
-  - keywords: ["example", "demo"]
-  - patterns: ["create.*example"]
----
-
-# Example Skill
-
-## Description
-이 스킬은 예제를 생성합니다.
-
-## Instructions
-1. 사용자 요청 분석
-2. 예제 템플릿 로드
-3. 커스터마이징 후 출력
-```
-
-### 3. 테스트 작성
-```bash
-touch tests/skills/{skill-name}.test.js
-```
-
----
-
-## 체크리스트
-
-스킬 개발 전 확인:
-- [ ] requirements.md의 요구사항 확인
-- [ ] 공식 문서에서 유사 패턴 조사
-- [ ] SKILL.md 필수 섹션 작성
-- [ ] 테스트 커버리지 80% 이상
-- [ ] rules/skill-rules.json에 규칙 추가
+자세한 생성 방법은 다음 문서 참고:
+- [도구 생성 가이드](../docs/guidelines/tool-creation.md#1-skill-생성)
+- [Requirements](../docs/requirements.md#21-skills-스킬)
 
 ---
 
@@ -79,6 +34,13 @@ touch tests/skills/{skill-name}.test.js
 
 ---
 
+## 사용 가능한 스킬
+
+현재 등록된 스킬이 없습니다.
+
+---
+
 ## 변경 이력
 
+- **2025-11-29**: 문서 최신화 (스킬 목록 추가)
 - **2025-11-28**: skills 디렉토리 생성

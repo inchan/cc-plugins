@@ -4,11 +4,13 @@
 
 **구현 위치**: `agents/tdd/`, `commands/tdd-team.md`
 
+**아키텍처**: `/tdd-team` 커맨드가 메인 스레드에서 5개 에이전트를 조율
+
 ---
 
 ## 개요
 
-6개의 전문화된 에이전트가 협업하여 Red-Green-Refactor 사이클을 자동화하는 TDD 개발 팀 시스템입니다.
+5개의 전문화된 에이전트가 협업하여 Red-Green-Refactor 사이클을 자동화하는 TDD 개발 팀 시스템입니다.
 
 ### 핵심 원칙
 
@@ -19,7 +21,7 @@
 
 ---
 
-## 에이전트 구성 (6개)
+## 에이전트 구성 (5개)
 
 | 에이전트 | 역할 | 책임 | 도구 |
 |---------|------|------|------|
@@ -28,7 +30,8 @@
 | **Implementer** | Green 단계 | 테스트 통과하는 최소 코드 | Read, Edit, Bash |
 | **Refactorer** | Refactor 단계 | 코드 품질 개선 | Read, Edit, Grep, Bash |
 | **Reviewer** | 품질 검증 | 승인/거부 결정 + 피드백 | Read, Grep, Bash |
-| **Orchestrator** | 워크플로우 조율 | 전체 흐름 제어 + 루프 관리 | Task, TodoWrite, AskUserQuestion |
+
+**워크플로우 조율**: `/tdd-team` 커맨드가 메인 스레드에서 담당 (Claude Code 제약으로 인한 아키텍처 변경)
 
 ---
 
@@ -40,7 +43,8 @@
 사용자: /tdd-team "기능 설명"
     ↓
 ┌─────────────────────────────────────┐
-│ TDD Orchestrator 활성화              │
+│ /tdd-team 커맨드 활성화              │
+│ (메인 스레드에서 워크플로우 조율)     │
 └─────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────┐
@@ -213,7 +217,7 @@ FOR EACH task:
 
 ## 루프 제어 로직
 
-### Orchestrator의 핵심 루프
+### /tdd-team 커맨드의 핵심 루프
 
 ```python
 def orchestrate(feature_description):
@@ -532,7 +536,7 @@ Red → Green → Refactor
 
 ## 관련 문서
 
-- [TDD Orchestrator](../../../agents/tdd/orchestrator.md)
+- [TDD Orchestrator 가이드](./tdd-orchestrator-guide.md) (참조용)
 - [Task Planner](../../../agents/tdd/task-planner.md)
 - [Test Writer](../../../agents/tdd/test-writer.md)
 - [Implementer](../../../agents/tdd/implementer.md)
@@ -545,4 +549,5 @@ Red → Green → Refactor
 
 ## 변경 이력
 
+- **2025-11-29**: orchestrator 에이전트 제거, /tdd-team 커맨드가 조율 담당 (5개 에이전트로 변경)
 - **2025-11-28**: TDD 다중 에이전트 패턴 문서 작성

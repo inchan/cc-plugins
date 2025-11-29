@@ -68,23 +68,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## 워크플로우 (간략)
-
-### 개발 전
-1. 관련 문서 읽기 (instruction.md → requirements.md → guidelines)
-2. 공식 문서 확인 (Anthropic 공식 자료)
-3. 성공 기준 정의
-
-### 개발 중
-1. 템플릿 사용
-2. 베스트 프랙티스 준수
-3. 서브에이전트 적극 활용 (가능하면 병렬 실행)
-
-### 개발 후
-1. 테스트 작성 (커버리지 80% 이상)
-2. 문서 업데이트
-3. 변경 이력 기록
-4. 자기비판리뷰
+## 워크플로우
 
 상세 워크플로우는 **[workflows.md](docs/workflows.md)** 참고
 
@@ -128,16 +112,17 @@ npm run build
 
 ```
 cc-skills/
-├── skills/                # 스킬 구현
-├── hooks/                 # 훅 구현
-├── agents/                # 에이전트 구현
-├── commands/              # 커맨드 구현
-├── rules/                 # 규칙 정의
-├── templates/             # 템플릿
-├── docs/                  # 문서
+├── agents/                # 서브에이전트 (TDD 개발 팀 5개)
+│   └── tdd/              # task-planner, test-writer, implementer, refactorer, reviewer
+├── commands/              # 슬래시 커맨드 (tdd-team)
+├── skills/                # 확장 스킬
+├── hooks/                 # 이벤트 훅
+├── rules/                 # 활성화 규칙
+├── templates/             # 컴포넌트 템플릿
+├── docs/                  # 프로젝트 문서
 │   ├── guidelines/        # 개발 가이드라인 (필수)
 │   └── references/        # 레퍼런스 패턴
-└── .claude-plugin/        # 플러그인 메타데이터
+└── .claude-plugin/        # 플러그인 메타데이터 (marketplace.json)
 ```
 
 각 디렉토리 상세 구조는 해당 디렉토리의 README.md 참고
@@ -159,6 +144,8 @@ cc-skills/
 
 ## 변경 이력
 
+- **2025-11-29**: 프로젝트 구조 최신화 (TDD 개발 팀 5개 에이전트 반영)
+- **2025-11-29**: 워크플로우 섹션 간소화 - workflows.md 참조로 변환
 - **2025-11-28**: QUICK_START.md 참조 제거 (파일 삭제됨)
 - **2025-11-28**: CLAUDE.md 대폭 간소화 - 참조 중심으로 리팩토링, 중복 제거 (60% → 5%)
 - **2025-11-28**: documentation.md 가이드라인 추가
