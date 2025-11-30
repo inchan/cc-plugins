@@ -1,0 +1,20 @@
+{
+  "name": "doc-tools",
+  "description": "문서 업데이트 자동화 - 추적가능성/교차검증/사용자중심/완성도 검증",
+  "version": "1.0.0",
+  "author": "inchan",
+  "commands": [
+    {
+      "name": "doc-update",
+      "source": "../../commands/doc-update.md",
+      "description": "문서-코드 불일치 탐지 및 수정"
+    }
+  ],
+  "agents": [
+    {
+      "name": "document-updater",
+      "source": "../../agents/doc-tools/document-updater.md",
+      "description": "문서 업데이트 검증 에이전트 (haiku)"
+    }
+  ]
+}

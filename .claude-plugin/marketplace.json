@@ -15,6 +15,10 @@
     {
       "name": "search",
       "source": "./plugins/search"
+    },
+    {
+      "name": "doc-tools",
+      "source": "./plugins/doc-tools"
     }
   ]
 }
