@@ -143,7 +143,27 @@ TodoWrite([
 ])
 ```
 
-**4.2 최종 리포트**
+**4.2 이슈 정렬**
+
+우선순위 순서대로 이슈를 정렬:
+```
+category_order = ["cross-validation", "traceability", "user-centric", "completeness"]
+
+sorted_issues = issues.sort((a, b) => {
+    // 1. 카테고리 우선순위
+    IF category_order.indexOf(a.category) !== category_order.indexOf(b.category):
+        RETURN category_order.indexOf(a.category) - category_order.indexOf(b.category)
+
+    // 2. 파일명 알파벳 순
+    IF a.file !== b.file:
+        RETURN a.file.localeCompare(b.file)
+
+    // 3. 라인 번호 순
+    RETURN a.line - b.line
+})
+```
+
+**4.3 최종 리포트**
 
 ```markdown
 ## 문서 업데이트 결과
@@ -152,20 +172,49 @@ TodoWrite([
 - 총 문서: {total_files}개
 - 불일치 발견: {issues_found}개
 - 수정 완료: {fixes_applied}개
+- 실패한 파일: {failed_files}개
+
+{IF failed_files > 0:}
+### ⚠️ 처리 실패한 파일
+
+FOR EACH failed IN failed_files_list:
+  - **{failed.file}**: {failed.error}
+
+{END IF}
 
 ### 불일치 항목
 
 #### 1. 교차 검증 (Cross-Validation) - 최우선
-{issues 중 category="cross-validation" 항목 나열}
+
+FOR EACH issue IN issues WHERE category="cross-validation":
+  - **{issue.file}:{issue.line}**
+    - 문제: {issue.description}
+    - 제안: {issue.suggestion}
+    - 상태: {issue.fixed ? "✓ 자동 수정 완료" : "⚠️ 수동 검토 필요"}
 
 #### 2. 추적가능성 (Traceability)
-{issues 중 category="traceability" 항목 나열}
+
+FOR EACH issue IN issues WHERE category="traceability":
+  - **{issue.file}:{issue.line}**
+    - 문제: {issue.description}
+    - 제안: {issue.suggestion}
+    - 상태: {issue.fixed ? "✓ 자동 수정 완료" : "⚠️ 수동 검토 필요"}
 
 #### 3. 사용자 중심 (User-Centric)
-{issues 중 category="user-centric" 항목 나열}
+
+FOR EACH issue IN issues WHERE category="user-centric":
+  - **{issue.file}:{issue.line}**
+    - 문제: {issue.description}
+    - 제안: {issue.suggestion}
+    - 상태: {issue.fixed ? "✓ 자동 수정 완료" : "⚠️ 수동 검토 필요"}
 
 #### 4. 완성도 (Completeness)
-{issues 중 category="completeness" 항목 나열}
+
+FOR EACH issue IN issues WHERE category="completeness":
+  - **{issue.file}:{issue.line}**
+    - 문제: {issue.description}
+    - 제안: {issue.suggestion}
+    - 상태: {issue.fixed ? "✓ 자동 수정 완료" : "⚠️ 수동 검토 필요"}
 
 ### 다음 단계
 

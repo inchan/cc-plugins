@@ -100,10 +100,10 @@
 
 **실행**:
 ```bash
-/doc-update --scope=specific --path=docs/perfect-doc.md
+/doc-update --scope=specific --path=tests/doc-tools/fixtures/perfect-doc.md
 ```
 
-*전제: perfect-doc.md는 불일치가 없는 완벽한 문서*
+*전제: perfect-doc.md는 불일치가 없는 완벽한 문서 (fixtures/에 생성됨)*
 
 **기대 결과**:
 - ✓ 메시지: "✓ 모든 문서가 최신 상태입니다."
@@ -119,10 +119,10 @@
 
 **실행**:
 ```bash
-/doc-update --scope=specific --path=docs/test-all-rules.md
+/doc-update --scope=specific --path=tests/doc-tools/fixtures/test-all-rules.md
 ```
 
-*전제: test-all-rules.md에는 4가지 원칙 위반 사항이 모두 포함됨*
+*전제: test-all-rules.md에는 4가지 원칙 위반 사항이 모두 포함됨 (fixtures/에 생성됨)*
 
 **기대 결과**:
 - ✓ 교차 검증 불일치 탐지 (예: 삭제된 파일 참조)
@@ -140,11 +140,9 @@
 
 ### 사전 준비
 
-1. 테스트 문서 생성:
-```bash
-# docs/test-all-rules.md 생성 (4가지 원칙 위반 포함)
-# docs/perfect-doc.md 생성 (불일치 없음)
-```
+1. 테스트 문서는 이미 생성되어 있습니다:
+   - `tests/doc-tools/fixtures/perfect-doc.md` (불일치 없음)
+   - `tests/doc-tools/fixtures/test-all-rules.md` (4가지 원칙 위반 포함)
 
 2. 플러그인 활성화:
 ```bash
@@ -168,10 +166,10 @@ claude --reload-plugins
 /doc-update --scope=specific
 
 # 6. 불일치 0개
-/doc-update --scope=specific --path=docs/perfect-doc.md
+/doc-update --scope=specific --path=tests/doc-tools/fixtures/perfect-doc.md
 
 # 7. 4가지 원칙
-/doc-update --scope=specific --path=docs/test-all-rules.md
+/doc-update --scope=specific --path=tests/doc-tools/fixtures/test-all-rules.md
 ```
 
 ---

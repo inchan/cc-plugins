@@ -61,6 +61,7 @@ IF files.length === 0 (필터링 후):
 
 ```
 issues = []
+failed_files = []
 
 FOR EACH file IN files:
     TRY:
@@ -69,6 +70,10 @@ FOR EACH file IN files:
         issues.push(...file_issues)
     CATCH error:
         WARNING: "{file} 읽기 실패: {error.message}"
+        failed_files.push({
+            file: file,
+            error: error.message
+        })
 ```
 
 ### 3. 불일치 탐지 (4가지 원칙)
@@ -102,9 +107,30 @@ FOR EACH file IN files:
    ```
 
 3. **중복 정보 탐지**
+
+   **유사도 계산 알고리즘 (라인 기반 Jaccard Index):**
+   ```
+   FUNCTION calculateSimilarity(content1, content2):
+       lines1 = content1.split('\n').filter(line => line.trim().length > 0)
+       lines2 = content2.split('\n').filter(line => line.trim().length > 0)
+
+       // 공통 라인 수
+       commonLines = lines1.filter(line => lines2.includes(line))
+
+       // Jaccard Index: |교집합| / |합집합|
+       union = max(lines1.length, lines2.length)
+       similarity = commonLines.length / union
+
+       RETURN similarity
+   ```
+
+   **중복 탐지:**
    ```
    FOR EACH pair IN combinations(files, 2):
-       similarity = calculateSimilarity(pair[0], pair[1])
+       content1 = Read(pair[0])
+       content2 = Read(pair[1])
+       similarity = calculateSimilarity(content1, content2)
+
        IF similarity > 0.8:  // 80% 이상 겹침
            ISSUE: "중복 정보: {pair[0]} ↔ {pair[1]} ({similarity*100}% 유사)"
            SUGGESTION: "하나는 참조로 변경 권장"
@@ -223,8 +249,19 @@ FOR EACH issue IN issues.filter(i => i.auto_fixable):
   "summary": {
     "total_files": 10,
     "issues_found": 5,
-    "fixes_applied": 3
+    "fixes_applied": 3,
+    "failed_files": 2
   },
+  "failed_files": [
+    {
+      "file": "docs/broken.md",
+      "error": "Permission denied"
+    },
+    {
+      "file": "docs/corrupted.md",
+      "error": "Invalid UTF-8 encoding"
+    }
+  ],
   "issues": [
     {
       "category": "cross-validation",
