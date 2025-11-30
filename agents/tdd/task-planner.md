@@ -31,10 +31,89 @@ Task Planner는 다음과 같은 상황에서 활성화됩니다:
 - 각 동사마다 별도 작업으로 분리
 - 비즈니스 로직과 기술적 요구사항 구분
 
-**1.2 기술 스택 파악**
-- 프로젝트 루트의 package.json, requirements.txt, go.mod 등 확인
-- 테스트 프레임워크 자동 감지 (Jest, Pytest, Go test 등)
-- 언어 및 프레임워크에 맞는 작업 정의
+**1.2 언어 및 기술 스택 자동 감지**
+
+### 1단계: 프로젝트 루트 파일 나열
+
+프로젝트 루트의 파일을 확인하여 언어를 자동 감지합니다:
+```bash
+ls {project_root}
+```
+
+### 2단계: 언어 자동 감지
+
+다음 우선순위로 언어를 감지하세요:
+
+**감지 우선순위**:
+1. `tsconfig.json` + `.ts` 파일 → **TypeScript**
+2. `package.json` + `.js` 파일만 → **JavaScript**
+3. `pyproject.toml` 또는 `requirements.txt` → **Python**
+4. `go.mod` → **Go**
+5. `Cargo.toml` → **Rust**
+6. `pom.xml` 또는 `build.gradle` → **Java**
+
+**테스트 프레임워크 자동 감지**:
+- **TypeScript/JavaScript**: `package.json`의 `devDependencies` 확인
+  ```bash
+  grep -E "jest|vitest|mocha" package.json
+  ```
+- **Python**: `pyproject.toml`의 `[tool.pytest]` 또는 `requirements.txt` 확인
+  ```bash
+  grep -E "pytest|unittest" pyproject.toml requirements.txt
+  ```
+- **Go**: 기본 `go test` 사용
+- **Rust**: 기본 `cargo test` 사용
+
+### 3단계: 언어별 관례 적용
+
+감지된 언어에 맞게 다음 항목을 자동으로 조정하세요:
+
+**파일 경로 규칙** (언어별):
+- TypeScript: 구현 `src/**/*.ts`, 테스트 `src/**/*.test.ts`
+- JavaScript: 구현 `src/**/*.js`, 테스트 `src/**/*.test.js`
+- Python: 구현 `**/*.py`, 테스트 `tests/test_*.py`
+- Go: 구현 `**/*.go`, 테스트 `**/*_test.go`
+- Rust: 구현 `src/**/*.rs`, 테스트 `tests/**/*.rs`
+
+**네이밍 컨벤션** (언어별):
+- TypeScript/JavaScript: camelCase
+- Python: snake_case
+- Go: mixedCaps (public: MixedCaps, private: mixedCaps)
+- Rust: snake_case
+
+**테스트 명령어** (언어별):
+- TypeScript/JavaScript: `npm test` 또는 `npx jest`
+- Python: `pytest` 또는 `python -m pytest`
+- Go: `go test ./...`
+- Rust: `cargo test`
+
+### 4단계: 감지 결과 출력
+
+감지 결과를 JSON 형식으로 출력하세요:
+```json
+{
+  "language": "typescript",
+  "test_framework": "jest",
+  "package_manager": "npm",
+  "test_command": "npm test",
+  "naming_convention": "camelCase",
+  "file_patterns": {
+    "implementation": "src/**/*.ts",
+    "test": "src/**/*.test.ts"
+  },
+  "detected_from": ["package.json", "tsconfig.json"]
+}
+```
+
+**언어 감지 실패 시**:
+```json
+{
+  "language": "unknown",
+  "error": "지원되는 언어 파일을 찾을 수 없습니다.",
+  "supported_languages": ["TypeScript", "JavaScript", "Python", "Go", "Rust"],
+  "suggestion": "프로젝트 루트에 package.json, pyproject.toml, go.mod, Cargo.toml 중 하나가 필요합니다."
+}
+```
 
 **1.3 제약 조건 분석**
 - 보안 요구사항 (OWASP, 암호화 등)
@@ -143,6 +222,8 @@ glob "**/*.test.{ts,js,py}"
     "성능: 로그인 100ms 이내"
   ],
   "project_root": "/Users/user/project",
+  "language": "typescript",
+  "test_framework": "jest",
   "max_tasks": 20
 }
 ```
@@ -150,6 +231,8 @@ glob "**/*.test.{ts,js,py}"
 **필수 필드**:
 - `feature_description`: 기능 설명 (최소 10자)
 - `project_root`: 프로젝트 루트 경로
+- `language`: 프로젝트 언어 ("typescript" | "python")
+- `test_framework`: 테스트 프레임워크 ("jest" | "vitest" | "pytest" | "unittest")
 
 **선택 필드**:
 - `requirements`: 상세 요구사항 목록
@@ -165,6 +248,12 @@ glob "**/*.test.{ts,js,py}"
   "estimated_time_minutes": 240,
   "test_framework": "jest",
   "language": "typescript",
+  "language_config": {
+    "package_file": "package.json",
+    "test_command": "npm test",
+    "test_file_pattern": "*.test.ts",
+    "implementation_pattern": "src/**/*.ts"
+  },
   "tasks": [
     {
       "id": "TASK-001",
@@ -270,6 +359,73 @@ glob "**/*.test.{ts,js,py}"
 }
 ```
 
+### Example 1-B: 간단한 유틸리티 함수 (Python)
+
+**Input**:
+```json
+{
+  "feature_description": "숫자 리스트의 합계를 계산하는 함수",
+  "project_root": "/Users/user/math-utils",
+  "language": "python",
+  "test_framework": "pytest"
+}
+```
+
+**Process**:
+1. 기능 분석: 단일 함수 (sum_numbers)
+2. 작업 분해: 1개 작업으로 충분
+3. 성공 기준 정의: Input=List[int], Output=int, Edge Cases 5개
+4. 테스트 프레임워크 감지: pyproject.toml 확인 → Pytest
+
+**Output**:
+```json
+{
+  "status": "success",
+  "total_tasks": 1,
+  "estimated_time_minutes": 15,
+  "test_framework": "pytest",
+  "language": "python",
+  "language_config": {
+    "package_file": "pyproject.toml",
+    "test_command": "pytest",
+    "test_file_pattern": "test_*.py",
+    "implementation_pattern": "**/*.py"
+  },
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "리스트 합계 함수",
+      "description": "숫자 리스트의 모든 요소를 합산하는 순수 함수",
+      "priority": 0,
+      "dependencies": [],
+      "success_criteria": {
+        "input": {
+          "type": "List[int]",
+          "description": "합산할 숫자 리스트"
+        },
+        "output": {
+          "type": "int",
+          "description": "리스트 요소의 총합"
+        },
+        "edge_cases": [
+          "빈 리스트 [] → 0",
+          "단일 요소 [5] → 5",
+          "음수 포함 [1, -2, 3] → 2",
+          "소수점 불가 (int만) → TypeError",
+          "큰 숫자 [10**10, 10**10] → 2*10**10"
+        ]
+      },
+      "files": {
+        "implementation": "math_utils/sum.py",
+        "test": "tests/test_sum.py"
+      },
+      "estimated_minutes": 15
+    }
+  ],
+  "execution_order": ["TASK-001"]
+}
+```
+
 ### Example 2: 중간 복잡도 기능 (사용자 인증)
 
 **Input**:
@@ -278,11 +434,11 @@ glob "**/*.test.{ts,js,py}"
   "feature_description": "사용자 인증 API",
   "requirements": [
     "이메일/비밀번호 로그인",
-    "JWT 토큰 발급",
-    "비밀번호 해싱 (bcrypt)"
+    "토큰 기반 인증 (JWT 또는 유사 라이브러리)",
+    "안전한 비밀번호 해싱 (bcrypt, argon2 등)"
   ],
   "constraints": [
-    "보안: bcrypt rounds=10",
+    "보안: 해싱 알고리즘 강도 설정 (bcrypt rounds=10 또는 argon2)",
     "성능: 로그인 100ms 이내"
   ],
   "project_root": "/Users/user/api-server"
@@ -490,6 +646,19 @@ TASK-001: 사용자 인증 전체 구현
 
 - **Created**: 2025-11-28
 - **Author**: Claude Code TDD Team
-- **Last Updated**: 2025-11-28
-- **Version**: 1.0
+- **Last Updated**: 2025-11-30
+- **Version**: 2.0
 - **Agent Type**: TDD 계획 전문가 (Task Decomposition + Success Criteria)
+
+---
+
+## 변경 이력
+
+- **2025-11-30 (v2.0)**: 언어 독립성 개선 - AI Prompt-Based 방식 적용
+  - 하드코딩된 언어별 매핑 테이블 제거 (L36-59)
+  - 자동 언어 감지 로직으로 교체 (TypeScript, Python, Go, Rust, Java 지원)
+  - 테스트 프레임워크 동적 감지 추가
+  - 언어별 관례(파일 경로, 네이밍, 테스트 명령어) 자동 적용
+  - 감지 실패 시 명확한 에러 메시지 및 지원 언어 목록 제공
+- **2025-11-30 (v1.1)**: Python 지원 추가 (언어 감지 로직, I/O 스키마 확장, Example 1-B)
+- **2025-11-28**: 초기 작성

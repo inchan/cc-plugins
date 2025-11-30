@@ -11,6 +11,10 @@
     {
       "name": "tdd",
       "source": "./plugins/tdd"
+    },
+    {
+      "name": "search",
+      "source": "./plugins/search"
     }
   ]
 }

@@ -1,0 +1,18 @@
+{
+    "name": "search",
+    "version": "0.1.1",
+    "description": "웹 검색 통합 플러그인 - 공식 문서/종합/모범 사례 검색",
+    "author": {
+        "name": "inchan",
+        "url": "https://github.com/inchan"
+    },
+    "skills": [
+        "./../../skills/search-core/SKILL.md"
+    ],
+    "commands": [
+        "./../../commands/search.md"
+    ],
+    "agents": [
+        "./../../agents/search/search-agent.md"
+    ]
+}

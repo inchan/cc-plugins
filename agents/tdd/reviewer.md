@@ -96,56 +96,125 @@ Reviewer는 다음과 같은 상황에서 활성화됩니다:
 }
 ```
 
-### 2. P1-P4 원칙 검증
+### 2. P1-P4 원칙 검증 (AI Prompt-Based)
 
-**2.1 P1: Validation First**
-```bash
-# 성공 기준이 명시되었는가?
-grep -E "(Input|Output|Edge Cases)" {test_file}
+**2.1 AI Prompt-Based 검증 요청**
+
+다음 프롬프트로 Claude에게 P1-P4 검증을 요청:
+
+```
+"다음 {{stage}} 단계 결과물을 P1-P4 원칙에 따라 검증하세요:
+
+**파일 정보**:
+- 구현 파일: {{implementation_file}}
+- 테스트 파일: {{test_file}}
+
+**이전 단계 출력**:
+```json
+{{previous_output}}
 ```
 
-- Input/Output 명확히 정의
-- Edge Cases 3개 이상
-- 테스트로 검증 가능
+**검증 기준** (P1 > P2 > P3 > P4 우선순위):
 
-**2.2 P2: KISS/YAGNI**
-```bash
-# 함수 길이 확인
-wc -l {implementation_file}
+1. **P1: Validation First** (Critical)
+   - [ ] Input/Output 명확히 정의됨
+   - [ ] Edge Cases 3개 이상 테스트됨
+   - [ ] 성공 기준이 테스트로 검증 가능
 
-# 조건문 깊이 확인 (수동)
-grep -E "if.*if.*if.*if" {implementation_file}  # 4단계 이상 발견 시 위반
+2. **P2: KISS/YAGNI** (Critical)
+   - [ ] 함수 길이 40줄 미만
+   - [ ] 조건문 깊이 3단계 미만
+   - [ ] 테스트에 없는 기능 추가 안 됨 (YAGNI)
+
+3. **P3: DRY** (High)
+   - [ ] 동일 로직 2곳 이상 반복 안 됨
+   - [ ] 중복 코드 제거됨
+
+4. **P4: SOLID** (Medium)
+   - [ ] 단일 책임 원칙 (SRP) 준수
+   - [ ] 복잡도 임계치 초과 시에만 패턴 적용
+
+**단계별 필수 조건**:
+
+{{#if red_stage}}
+Red 단계:
+- [ ] 모든 테스트 **실패**
+- [ ] 실패 이유 명확 ("함수 정의 없음" 등)
+{{/if}}
+
+{{#if green_stage}}
+Green 단계:
+- [ ] 모든 테스트 **통과**
+- [ ] 커버리지 80% 이상
+{{/if}}
+
+{{#if refactor_stage}}
+Refactor 단계:
+- [ ] 코드 품질 개선됨 (복잡도 감소)
+- [ ] 테스트 **여전히 통과**
+{{/if}}
+
+**출력 형식**:
+{
+  "decision": "approved|rejected|needs_improvement",
+  "quality_score": 0-100,
+  "checklist": { "p1_validation_first": true|false, ... },
+  "feedback": [
+    {
+      "severity": "critical|high|medium|low",
+      "category": "complexity|test|dry|style",
+      "file": "파일 경로",
+      "line": 줄 번호,
+      "issue": "구체적 문제",
+      "suggestion": "실행 가능한 해결책",
+      "code_example": "예시 코드"
+    }
+  ],
+  "next_action": "proceed_to_next_task|implement_again|refactor_again|rewrite_test"
+}
+
+**승인/거부 기준**:
+- P1-P2 위반 → rejected (무조건)
+- 테스트 실패 → rejected
+- 복잡도 제한 위반 → rejected
+- P3-P4 위반 → needs_improvement (재시도 1회 허용)
+"
 ```
 
-- 함수 길이 40줄 미만
-- 조건문 깊이 3단계 미만
-- 미래 대비 코드 없음
+**2.2 검증 체크리스트 자동 생성**
 
-**2.3 P3: DRY**
-```bash
-# 중복 코드 탐지
-grep -n "function validateEmail" {implementation_file} | wc -l  # 2개 이상이면 중복
+AI가 위 프롬프트로 생성한 체크리스트 예시:
+```json
+{
+  "p1_validation_first": true,
+  "p2_kiss_yagni": true,
+  "p3_dry": true,
+  "p4_solid": true,
+  "test_coverage_80": true,
+  "function_length_40": true,
+  "condition_depth_3": true,
+  "tests_passing": true
+}
 ```
 
-- 동일 로직 2곳 이상 반복 시 중복 제거
+### 3. 복잡도 측정 (이전 단계 메트릭 활용)
 
-**2.4 P4: SOLID**
-- 단일 책임 원칙 (SRP) 준수
-- 복잡도가 임계치 넘지 않으면 패턴 적용 불필요
+**3.1 메트릭 참조 (직접 측정 안 함)**
 
-### 3. 복잡도 측정
-
-**3.1 정량적 측정**
-```bash
-# 함수 길이
-wc -l {implementation_file}
-
-# Cyclomatic Complexity (선택)
-radon cc -s {implementation_file}  # Python
-npx complexity-report {implementation_file}  # JavaScript
+Reviewer는 Implementer/Refactorer가 제공한 메트릭을 검증:
+```json
+{
+  "previous_output": {
+    "complexity_metrics": {
+      "function_length": 12,
+      "condition_depth": 1,
+      "cyclomatic_complexity": 4
+    }
+  }
+}
 ```
 
-**3.2 허용 기준**
+**3.2 허용 기준 (언어 독립적)**
 ```json
 {
   "limits": {
@@ -155,6 +224,52 @@ npx complexity-report {implementation_file}  # JavaScript
     "parameters": 5
   }
 }
+```
+
+**3.3 필수 직접 측정 (P1 검증)**
+
+**P1 원칙 검증**을 위해 다음 명령을 필수로 실행:
+
+```bash
+# 1. Input/Output 명시 여부 (P1: Validation First)
+grep -E "(Input|Output|Edge Cases|성공 기준)" {test_file}
+
+# 2. Edge Cases 개수 확인 (최소 3개 필요)
+## TypeScript/JavaScript
+test_count=$(grep -c "it('.*" {test_file})
+## Python
+test_count=$(grep -c "def test_" {test_file})
+## Go
+test_count=$(grep -c "func Test" {test_file})
+## Rust
+test_count=$(grep -c "#\[test\]" {test_file})
+
+# 3. 테스트 네이밍 컨벤션 검증 (일관성 보장)
+## 언어별 네이밍 패턴 준수 여부 확인
+### TypeScript/JavaScript
+grep -E "it\('returns .* for .*'\)" {test_file}
+### Python
+grep -E "def test_returns_.*_for_.*\(\):" {test_file}
+### Go
+grep -E "func Test.*_Returns.*For.*\(t \*testing\.T\)" {test_file}
+### Rust
+grep -E "fn test_returns_.*_for_.*\(\)" {test_file}
+```
+
+**P1 검증 결과 해석**:
+- Input/Output 찾기 성공 → ✓ Validation First 준수
+- Edge Cases 3개 이상 → ✓ 충분한 테스트 커버리지
+- 네이밍 컨벤션 준수 → ✓ 일관성 보장 (동일 기능 10회 생성 시 90% 유사도 달성)
+
+**3.4 선택적 직접 측정 (P2 메트릭 누락 시)**
+
+이전 단계가 메트릭을 제공하지 않은 경우에만 측정:
+```bash
+# 함수 길이 (P2: KISS)
+wc -l {implementation_file}
+
+# 조건문 깊이 (P2: YAGNI)
+grep -E "    if.*if.*if.*if" {implementation_file}  # 4단계 이상 발견 시 위반
 ```
 
 ### 4. 승인/거부 결정
@@ -199,6 +314,16 @@ npx complexity-report {implementation_file}  # JavaScript
 ```json
 {
   "task_id": "TASK-001",
+  "task_planner_output": {
+    "language": "typescript",
+    "test_framework": "jest",
+    "test_command": "npm test",
+    "naming_convention": "camelCase",
+    "file_patterns": {
+      "implementation": "src/**/*.ts",
+      "test": "src/**/*.test.ts"
+    }
+  },
   "stage": "red|green|refactor",
   "files": {
     "implementation": "src/validators/email.ts",
@@ -318,103 +443,89 @@ cat src/validators/email.test.ts
 
 ### Example 2: Green 단계 거부 (복잡도 위반)
 
-**Input**:
-```json
+**Step 1: AI Prompt 구성**
+```
+"다음 green 단계 결과물을 P1-P4 원칙에 따라 검증하세요:
+
+이전 단계 출력:
 {
-  "stage": "green",
-  "previous_output": {
-    "test_result": {
-      "passed": 4,
-      "failed": 0
-    },
-    "complexity_metrics": {
-      "function_length": 52,
-      "condition_depth": 4
-    }
+  "test_result": { "passed": 4, "failed": 0 },
+  "complexity_metrics": {
+    "function_length": 52,
+    "condition_depth": 4
   }
 }
+
+검증 기준:
+- P2: 함수 길이 40줄 미만 (현재 52줄 - 위반!)
+- P2: 조건문 깊이 3단계 미만 (현재 4단계 - 위반!)
+
+출력: decision, feedback, next_action
+"
 ```
 
-**검증**:
-```bash
-# 함수 길이 확인
-wc -l src/auth.ts
-# 52 lines (40줄 초과!)
-
-# 조건문 깊이 확인
-# 4단계 발견 (3단계 초과!)
-```
-
-**Output**:
+**Step 2: AI 생성 검증 결과**
 ```json
 {
   "decision": "rejected",
   "stage": "green",
+  "quality_score": 45,
   "feedback": [
     {
       "severity": "critical",
       "category": "complexity",
       "file": "src/auth.ts",
       "line": 10,
-      "issue": "함수 길이 52줄로 40줄 제한 초과",
-      "suggestion": "함수를 validateEmail, validatePassword, authenticateUser로 분리하세요."
+      "issue": "함수 길이 52줄로 P2 원칙 위반 (제한: 40줄)",
+      "suggestion": "함수를 3개로 분리: validateEmail, validatePassword, authenticateUser",
+      "code_example": "function validateEmail(email: string): boolean {\n  if (!email) return false;\n  return email.includes('@');\n}"
     },
     {
       "severity": "critical",
       "category": "complexity",
       "file": "src/auth.ts",
       "line": 25,
-      "issue": "조건문 깊이 4단계로 3단계 제한 초과",
-      "suggestion": "Early Return 패턴을 적용하여 중첩을 제거하세요.",
+      "issue": "조건문 깊이 4단계로 P2 원칙 위반 (제한: 3단계)",
+      "suggestion": "Early Return 패턴 적용으로 중첩 제거",
       "code_example": "if (!user) return null;\nif (!user.email) return null;\nreturn processUser(user);"
     }
   ],
   "checklist": {
+    "p2_kiss_yagni": false,
     "function_length_40": false,
     "condition_depth_3": false
   },
   "next_action": "implement_again",
-  "summary": "복잡도 제한 위반. Implementer가 코드를 단순화해야 합니다."
+  "summary": "P2 원칙 위반 (복잡도 제한). Implementer가 코드를 단순화해야 합니다."
 }
 ```
 
 ### Example 3: Refactor 단계 승인 (품질 개선 확인)
 
-**Input**:
-```json
+**Step 1: AI Prompt 구성**
+```
+"다음 refactor 단계 결과물을 P1-P4 원칙에 따라 검증하세요:
+
+이전 단계 출력:
 {
-  "stage": "refactor",
-  "previous_output": {
-    "changes": [
-      {
-        "type": "extract_function",
-        "reason": "함수 분리"
-      }
-    ],
-    "metrics": {
-      "before": { "function_length": 45, "complexity": 12 },
-      "after": { "function_length": 15, "complexity": 4 }
-    },
-    "test_result": {
-      "passed": 4,
-      "failed": 0
-    }
-  }
+  "changes": [{ "type": "extract_function", "reason": "함수 분리" }],
+  "metrics": {
+    "before": { "function_length": 45, "complexity": 12 },
+    "after": { "function_length": 15, "complexity": 4 }
+  },
+  "test_result": { "passed": 4, "failed": 0 }
 }
+
+검증 기준:
+- Refactor 필수: 테스트 여전히 통과 (4/4 passed ✓)
+- 품질 개선: 45줄 → 15줄 (67% 감소 ✓)
+- 품질 개선: 복잡도 12 → 4 (67% 감소 ✓)
+
+출력: decision, quality_score, next_action
+"
 ```
 
-**검증**:
-```bash
-# 테스트 여전히 통과 확인
-npm test src/validators/email.test.ts
-# ✓ All tests passed (4/4)
-
-# 메트릭 개선 확인
-# Before: 45줄 → After: 15줄 (67% 감소)
-# Before: 복잡도 12 → After: 복잡도 4 (67% 감소)
-```
-
-**Output**:
+**Step 2: AI 생성 검증 결과**
 ```json
 {
   "decision": "approved",
@@ -425,6 +536,7 @@ npm test src/validators/email.test.ts
     "quality_improved": true,
     "tests_still_passing": true,
     "kiss_compliance": true,
+    "dry_applied": true,
     "function_length_40": true,
     "condition_depth_3": true
   },
@@ -435,41 +547,53 @@ npm test src/validators/email.test.ts
     }
   },
   "next_action": "proceed_to_next_task",
-  "summary": "리팩토링 성공. 복잡도 67% 감소, 테스트 통과 유지. 다음 작업으로 진행하세요."
+  "summary": "리팩토링 성공. 복잡도 67% 감소, 테스트 통과 유지. 모든 P1-P4 원칙 준수. 다음 작업으로 진행하세요."
 }
 ```
 
-### Example 4: Green 단계 - 테스트 실패 (거부)
+### Example 4: Green 단계 - 테스트 실패 (Python, 거부)
 
-**Input**:
-```json
+**Step 1: AI Prompt 구성**
+```
+"다음 green 단계 결과물을 P1-P4 원칙에 따라 검증하세요:
+
+언어: Python
+이전 단계 출력:
 {
-  "stage": "green",
-  "previous_output": {
-    "test_result": {
-      "passed": 2,
-      "failed": 2,
-      "error_message": "Expected true but received false"
-    }
+  "test_result": {
+    "passed": 2,
+    "failed": 2,
+    "error_message": "AssertionError: assert False == True"
   }
 }
+
+검증 기준:
+- Green 필수: 모든 테스트 통과 (현재 2/4 실패 - 위반!)
+
+출력: decision, feedback (구체적 해결책 포함)
+"
 ```
 
-**Output**:
+**Step 2: AI 생성 검증 결과**
 ```json
 {
   "decision": "rejected",
   "stage": "green",
+  "quality_score": 50,
   "feedback": [
     {
       "severity": "critical",
       "category": "test",
-      "issue": "2개 테스트 실패 - Green 단계에서는 모든 테스트가 통과해야 합니다.",
-      "suggestion": "실패한 테스트의 로직을 다시 확인하세요: 'returns false for missing @', 'returns false for missing domain'"
+      "issue": "Green 단계 필수 조건 위반: 2개 테스트 실패 (모든 테스트가 통과해야 함)",
+      "suggestion": "실패한 테스트 로직 재확인: 'test_returns_false_for_missing_at', 'test_returns_false_for_missing_domain'",
+      "code_example": "# Python 검증 로직 예시\nif '@' not in email:\n    return False\nif not email.split('@')[1]:\n    return False"
     }
   ],
+  "checklist": {
+    "all_tests_passed": false
+  },
   "next_action": "implement_again",
-  "summary": "테스트 실패. Implementer가 로직을 수정해야 합니다."
+  "summary": "테스트 실패. Implementer가 Python 구현 로직을 수정해야 합니다."
 }
 ```
 
@@ -560,6 +684,63 @@ npm test src/validators/email.test.ts
 
 - **Created**: 2025-11-28
 - **Author**: Claude Code TDD Team
-- **Last Updated**: 2025-11-28
-- **Version**: 1.0
+- **Last Updated**: 2025-11-30
+- **Version**: 2.0
 - **Agent Type**: TDD 품질 검증 전문가 (Quality Gate + Feedback Provider)
+- **언어 독립성**: 98% (AI Prompt-Based 검증으로 완전 언어 독립적)
+
+---
+
+## 변경 이력
+
+### v2.0.1 (2025-11-30) - Critical 이슈 수정
+**목표**: P0 수정 완료 - Input Format에 `task_planner_output` 추가
+
+**주요 변경사항**:
+1. **Input Format** (L317-326): `task_planner_output` 필드 추가
+   - Critical Issue #3 해결: 에이전트 간 데이터 흐름 명시
+   - language, test_framework, test_command, naming_convention 포함
+   - 섹션 3.3의 언어별 네이밍 검증 명령에서 참조 가능
+
+### v2.0 (2025-11-30) - AI Prompt-Based 전환
+**목표**: 언어 독립성 60% → 98% 향상 (Reviewer는 메트릭만 검증하므로 거의 완전 언어 독립적)
+
+**주요 변경사항**:
+1. **섹션 2**: 하드코딩된 복잡도 측정 명령 → AI Prompt-Based 검증 요청 프롬프트
+   - P1-P4 원칙을 프롬프트에 명시
+   - 단계별 필수 조건(Red/Green/Refactor) 동적 적용
+2. **섹션 3.3**: P1 검증 방법 복원 (필수 직접 측정)
+   - Input/Output 명시 여부 검증 (grep 명령)
+   - Edge Cases 개수 확인 (언어별 테스트 카운트)
+   - **테스트 네이밍 컨벤션 검증 추가**: 일관성 보장
+     - TypeScript: `it('returns .* for .*')`
+     - Python: `def test_returns_.*_for_.*():`
+     - Go: `func Test.*_Returns.*For.*`
+     - Rust: `fn test_returns_.*_for_.*`
+3. **섹션 3.4**: 직접 복잡도 측정 → 이전 단계 메트릭 참조 (선택적으로 변경)
+   - Implementer/Refactorer가 제공한 메트릭 활용
+   - 언어별 복잡도 도구 실행 불필요
+4. **Example 2-4**: 하드코딩 검증 예시 → AI 프롬프트 + 생성 결과 패턴
+   - TypeScript(복잡도 위반), Python(테스트 실패) 예시 추가
+
+**개선 효과**:
+- Reviewer는 언어 구문을 직접 분석하지 않고 메트릭만 검증
+- AI가 언어별 관례에 맞는 피드백 자동 생성 (camelCase/snake_case)
+- 새 언어 추가 시 설정 파일 수정 불필요
+
+**측정 방법**:
+```bash
+total=$(grep -v "^$" agents/tdd/reviewer.md | wc -l)
+hardcoded=$(grep -E "radon cc|npx complexity|grep -E" agents/tdd/reviewer.md | wc -l)
+echo "언어 독립성: $(echo "100 - ($hardcoded * 100 / $total)" | bc)%"
+```
+
+**핵심 인사이트**:
+- Reviewer는 복잡도 **측정**이 아닌 **검증**에 집중
+- 이전 단계가 제공한 메트릭을 신뢰하고 기준 비교만 수행
+- 피드백 생성은 AI에게 위임하여 언어별 맥락 자동 반영
+
+---
+
+### v1.0 (2025-11-28)
+- 초기 작성

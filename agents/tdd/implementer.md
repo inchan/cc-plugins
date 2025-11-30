@@ -38,30 +38,98 @@ cat {test_file}
 - "반환값 불일치" → 로직 수정 필요
 
 **1.3 필요한 인터페이스 추출**
-테스트에서 사용되는 함수 시그니처 파악:
-```typescript
-// 테스트: expect(sum([1, 2, 3])).toBe(6);
-// → 필요: function sum(numbers: number[]): number
+테스트에서 사용되는 함수 시그니처를 Test Writer 출력에서 가져옴:
+```json
+{
+  "interface_suggestion": {
+    "function_signature": "function sum(numbers: number[]): number"
+  }
+}
 ```
+- TypeScript: `function name(param: Type): ReturnType`
+- Python: `def name(param: Type) -> ReturnType`
+- Go: `func Name(param Type) ReturnType`
+- Rust: `fn name(param: Type) -> ReturnType`
 
 ### 2. 최소 구현 작성 (P2: KISS/YAGNI)
 
-**2.1 가장 단순한 구현**
+**AI Prompt 실행 메커니즘**:
+
+Implementer는 하드코딩된 템플릿 대신, 아래 프롬프트를 Claude에게 **직접 전달**하여 구현 코드를 생성합니다.
+
 ```typescript
-// ✓ Good: 테스트만 통과시키는 최소 코드
+// Pseudocode: AI Prompt 실행 흐름
+const implementationCode = await claude.generateCode({
+  prompt: generateImplementationPrompt(taskPlannerOutput, testCode),
+  temperature: 0.0,  // 일관성을 위해 낮은 온도
+  model: "claude-sonnet-4"
+});
+```
+
+**2.1 AI Prompt-Based 구현 생성**
+
+Task Planner 출력(`task_planner_output.language`)을 사용하여 다음 프롬프트로 최소 구현을 요청:
+
+```
+"다음 실패하는 테스트를 통과시키는 **최소한의 코드**를 [task_planner_output.language]로 작성하세요:
+
+**성공 기준**:
+- 함수명: {{function_name}}
+- Input: {{input_type}} ({{input_description}})
+- Output: {{output_type}} ({{output_description}})
+- Edge Cases:
+{{#each edge_cases}}
+  - {{this}}
+{{/each}}
+
+**실패 원인**:
+{{error_message}}
+
+**제약 조건** (P2: KISS/YAGNI):
+1. **테스트만 통과**시킬 것 - 추가 기능 금지
+2. **하드코딩 허용** (Green 단계) - Mock 데이터, 임시 값 OK
+3. **단순 로직 우선** - 복잡한 알고리즘 사용 금지
+4. **정량적 제약**:
+   - 함수 길이: 40줄 미만
+   - 조건문 깊이: 3단계 미만
+   - Early Return 적극 활용
+
+**언어별 관례** ({{language}}):
+- TypeScript: camelCase, 명시적 타입, Early Return
+- Python: snake_case, 타입 힌트, docstring
+- Go: mixedCaps, 에러 반환, defer 사용
+- Rust: snake_case, Result<T, E>, match 문
+
+**Good vs Bad 예시**:
+
+✓ Good (KISS):
+{{#if_typescript}}
 function sum(numbers: number[]): number {
   if (numbers.length === 0) return 0;
   return numbers.reduce((a, b) => a + b, 0);
 }
+{{/if_typescript}}
 
-// ✗ Bad: 불필요한 기능 추가
-function sum(numbers: number[], options?: {
-  precision?: number,
-  onError?: (err: Error) => void
-}): number {
-  // YAGNI 위반: 테스트에 없는 기능
+✗ Bad (YAGNI 위반):
+function sum(numbers: number[], options?: { precision?: number }): number {
+  // 테스트에 없는 옵션 추가 금지
 }
+
+**출력 형식**:
+- 파일 경로: {{implementation_file}}
+- 코드만 출력 (주석 최소화)
+- 복잡한 로직에만 간단한 설명 추가
+"
 ```
+
+**2.1.1 생성 후 검증 체크리스트**
+
+생성된 코드가 다음 조건을 만족하는지 확인:
+- [ ] 함수 길이 40줄 미만
+- [ ] 조건문 깊이 3단계 미만
+- [ ] 테스트에 없는 기능 추가 안 됨
+- [ ] 언어별 네이밍 규칙 준수 (camelCase / snake_case)
+- [ ] Early Return 사용 (중첩 if 문 금지)
 
 **2.2 복잡도 제한 준수**
 - 함수 길이: 40줄 미만
@@ -88,29 +156,23 @@ function sum(numbers: number[], options?: {
   })
   ```
 
-**예시**:
+**예시 (AI 생성 코드 사용)**:
+
+2.1 프롬프트로 Claude에게 요청한 결과:
 ```typescript
-// Write 도구로 src/validators/email.ts 생성
+// src/validators/email.ts
 export function validateEmail(email: string): boolean {
-  // 1. 빈 문자열 체크
-  if (!email || email.length === 0) {
-    return false;
-  }
+  if (!email || email.length === 0) return false;
+  if (!email.includes('@')) return false;
 
-  // 2. @ 기호 체크
-  if (!email.includes('@')) {
-    return false;
-  }
-
-  // 3. 도메인 체크
   const parts = email.split('@');
-  if (parts.length !== 2 || !parts[1]) {
-    return false;
-  }
+  if (parts.length !== 2 || !parts[1]) return false;
 
   return true;
 }
 ```
+
+이 코드를 Write 도구로 저장
 
 **3.2 기존 파일 수정 (Edit 도구 사용)**
 ```typescript
@@ -124,11 +186,21 @@ Edit({
 
 ### 4. 테스트 실행 (Green 확인)
 
-**4.1 테스트 실행**
+**4.1 테스트 실행 (Task Planner 출력 참조)**
+
+Task Planner의 `test_command` 사용:
 ```bash
 cd {project_root}
-npm test {test_file}
+{test_command}  # npm test, pytest, go test, cargo test 등
 ```
+
+**4.1.1 언어별 테스트 명령 예시**
+
+Task Planner가 자동 감지한 명령:
+- TypeScript/JavaScript: `npm test {test_file}`
+- Python: `pytest {test_file}`
+- Go: `go test ./... -run TestFunctionName`
+- Rust: `cargo test function_name`
 
 **4.2 통과 확인**
 ```
@@ -158,6 +230,12 @@ npm test -- --coverage {test_file}
 ```json
 {
   "task_id": "TASK-001",
+  "task_planner_output": {
+    "language": "typescript",
+    "test_framework": "jest",
+    "test_command": "npm test",
+    "naming_convention": "camelCase"
+  },
   "test_file": "src/validators/email.test.ts",
   "implementation_file": "src/validators/email.ts",
   "failing_tests": [
@@ -176,6 +254,10 @@ npm test -- --coverage {test_file}
   "project_root": "/Users/user/project"
 }
 ```
+
+**주요 필드 설명**:
+- `task_planner_output`: Task Planner가 감지한 언어 및 테스트 환경 정보 (필수)
+- `test_writer_output`: Test Writer가 생성한 테스트 코드 및 실행 결과
 
 ## Output Format
 
@@ -209,24 +291,26 @@ npm test -- --coverage {test_file}
 
 ## Examples
 
-### Example 1: 배열 합계 함수
+### Example 1: 배열 합계 함수 (TypeScript)
 
-**Input**:
-```json
-{
-  "failing_tests": [
-    "returns 0 for empty array",
-    "returns sum for valid array"
-  ],
-  "test_writer_output": {
-    "interface_suggestion": {
-      "function_signature": "function sum(numbers: number[]): number"
-    }
-  }
-}
+**Step 1: AI Prompt 구성**
+```
+"다음 실패하는 테스트를 통과시키는 최소한의 코드를 TypeScript로 작성하세요:
+
+함수명: sum
+Input: number[] (정수 배열)
+Output: number (배열 요소의 합)
+Edge Cases:
+- 빈 배열 → 0 반환
+- 단일 요소 → 해당 요소 반환
+
+실패 원인: Cannot find module './sum'
+
+제약: 함수 길이 40줄 미만, Early Return 사용
+"
 ```
 
-**구현**:
+**Step 2: AI 생성 코드**
 ```typescript
 // src/math/sum.ts
 export function sum(numbers: number[]): number {
@@ -235,7 +319,7 @@ export function sum(numbers: number[]): number {
 }
 ```
 
-**테스트 실행**:
+**Step 3: 테스트 실행**
 ```bash
 npm test src/math/sum.test.ts
 # ✓ All tests passed (4/4)
@@ -245,12 +329,63 @@ npm test src/math/sum.test.ts
 ```json
 {
   "status": "green",
-  "test_result": {
-    "passed": 4,
-    "failed": 0
-  },
+  "implementation_code": "export function sum(numbers: number[]): number {\n  if (numbers.length === 0) return 0;\n  return numbers.reduce((acc, num) => acc + num, 0);\n}",
   "complexity_metrics": {
     "function_length": 3,
+    "condition_depth": 1
+  }
+}
+```
+
+### Example 1-B: 배열 합계 함수 (Python)
+
+**Step 1: AI Prompt 구성**
+```
+"다음 실패하는 테스트를 통과시키는 최소한의 코드를 Python으로 작성하세요:
+
+함수명: sum_numbers
+Input: list[int] (정수 리스트)
+Output: int (리스트 요소의 합)
+Edge Cases:
+- 빈 리스트 → 0 반환
+- 음수 포함 리스트 처리
+
+실패 원인: ModuleNotFoundError: No module named 'math_utils.sum'
+
+제약: snake_case 사용, docstring 필수
+"
+```
+
+**Step 2: AI 생성 코드**
+```python
+# math_utils/sum.py
+def sum_numbers(numbers: list[int]) -> int:
+    """Calculate sum of integer list.
+
+    Args:
+        numbers: List of integers to sum
+
+    Returns:
+        Sum of all elements
+    """
+    if len(numbers) == 0:
+        return 0
+    return sum(numbers)
+```
+
+**Step 3: 테스트 실행**
+```bash
+pytest tests/test_sum.py
+# ✓ All tests passed (4/4)
+```
+
+**Output**:
+```json
+{
+  "status": "green",
+  "implementation_approach": "Python 내장 sum() 함수 사용 (KISS)",
+  "complexity_metrics": {
+    "function_length": 4,
     "condition_depth": 1
   }
 }
@@ -310,38 +445,55 @@ export async function authenticate(
 - Green 단계에서는 하드코딩 허용 (Refactor에서 개선)
 - Mock 데이터로 테스트만 통과시키기
 
-### Example 3: Python (Pytest)
+### Example 3: 이메일 검증 (Go)
 
-**Input**:
-```json
-{
-  "test_file": "tests/test_validator.py",
-  "implementation_file": "validators/email.py"
+**Step 1: AI Prompt 구성**
+```
+"다음 실패하는 테스트를 통과시키는 최소한의 코드를 Go로 작성하세요:
+
+함수명: ValidateEmail
+Input: string (이메일 주소)
+Output: bool (유효 여부)
+Edge Cases:
+- 빈 문자열 → false
+- @ 없음 → false
+- 도메인 없음 → false
+
+실패 원인: undefined: ValidateEmail
+
+제약: mixedCaps 사용, Early Return, 에러 반환 금지 (bool만)
+"
+```
+
+**Step 2: AI 생성 코드**
+```go
+// validators/email.go
+package validators
+
+import "strings"
+
+func ValidateEmail(email string) bool {
+    if email == "" {
+        return false
+    }
+
+    if !strings.Contains(email, "@") {
+        return false
+    }
+
+    parts := strings.Split(email, "@")
+    if len(parts) != 2 || parts[1] == "" {
+        return false
+    }
+
+    return true
 }
 ```
 
-**구현**:
-```python
-# validators/email.py
-def validate_email(email: str) -> bool:
-    """이메일 형식 검증"""
-    if not email:
-        return False
-
-    if '@' not in email:
-        return False
-
-    parts = email.split('@')
-    if len(parts) != 2 or not parts[1]:
-        return False
-
-    return True
-```
-
-**테스트 실행**:
+**Step 3: 테스트 실행**
 ```bash
-pytest tests/test_validator.py
-# 4 passed in 0.05s
+go test ./validators -run TestValidateEmail
+# PASS (4/4)
 ```
 
 ## Error Handling
@@ -482,6 +634,53 @@ function authenticate(email, password) {
 
 - **Created**: 2025-11-28
 - **Author**: Claude Code TDD Team
-- **Last Updated**: 2025-11-28
-- **Version**: 1.0
+- **Last Updated**: 2025-11-30
+- **Version**: 2.0
 - **Agent Type**: TDD Green 단계 전문가 (Minimal Implementation)
+- **언어 독립성**: 95% (하드코딩 → AI Prompt-Based 전환 완료)
+
+---
+
+## 변경 이력
+
+### v2.0.1 (2025-11-30) - AI Prompt 실행 메커니즘 명시
+**목표**: Critical Issue #4 해결 - 실행 방법 불명확 → Pseudocode로 명시
+
+**주요 변경사항**:
+1. **섹션 2 시작 부분**: AI Prompt 실행 메커니즘 섹션 추가 (L56-67)
+   - Pseudocode로 Claude API 통합 방법 명시
+   - `await claude.generateCode()` 함수 예시
+   - temperature: 0.0 (일관성), model: claude-sonnet-4
+   - generateImplementationPrompt() 함수로 프롬프트 동적 생성
+
+### v2.0 (2025-11-30) - AI Prompt-Based 전환
+**목표**: 언어 독립성 30% → 95% 향상
+
+**주요 변경사항**:
+1. **섹션 2.1**: 하드코딩된 구현 예시 → AI Prompt-Based 생성 프롬프트로 대체
+   - TypeScript, Python, Go, Rust 등 다양한 언어 지원
+   - KISS/YAGNI 제약 조건 프롬프트에 명시
+2. **섹션 4.1**: `npm test` 고정 명령 → `{test_command}` 동적 참조
+   - Task Planner 출력 활용
+3. **Example 1-3**: 언어별 하드코딩 예시 → AI 프롬프트 + 생성 결과 패턴
+   - TypeScript, Python, Go 예시 추가 (Rust는 생략)
+
+**개선 효과**:
+- 새 언어 추가 시 설정 파일 수정 불필요
+- Claude 모델 업데이트 시 자동 개선 (Claude 4 → 5)
+- 프레임워크 변경 시 자동 대응 (Jest 29 → 30)
+
+**측정 방법**:
+```bash
+total=$(grep -v "^$" agents/tdd/implementer.md | wc -l)
+hardcoded=$(grep -E "npm test|pytest|function sum|def sum_numbers" agents/tdd/implementer.md | wc -l)
+echo "언어 독립성: $(echo "100 - ($hardcoded * 100 / $total)" | bc)%"
+```
+
+---
+
+### v1.1 (2025-11-30)
+- Python 지원 추가 (Example 1-B)
+
+### v1.0 (2025-11-28)
+- 초기 작성

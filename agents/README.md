@@ -16,6 +16,10 @@ agents/
 │   ├── refactorer.md     # Refactor 단계
 │   ├── reviewer.md       # 품질 검증
 │   └── tests/            # 테스트 가이드
+├── search/           # 검색 에이전트 (3개)
+│   ├── official-docs.md    # 공식 문서 전문가
+│   ├── comprehensive.md    # 종합 조사 리서처
+│   └── best-practice.md    # 모범 사례 전문가
 └── {agent-name}.md   # 에이전트 프롬프트
 ```
 
@@ -45,6 +49,19 @@ agents/
 - [TDD 다중 에이전트 패턴](../docs/references/agents/tdd-multi-agent-pattern.md)
 - [TDD Orchestrator 가이드](../docs/references/agents/tdd-orchestrator-guide.md) (참조용)
 
+### Search 에이전트 (검색 시스템)
+
+| 에이전트 | 역할 | 검색 범위 | 주요 기능 |
+|---------|------|----------|----------|
+| **search-official-docs** | 공식 문서 전문가 | 공식 출처만 | Context7 MCP + 공식 사이트/저장소/블로그 |
+| **search-comprehensive** | 종합 조사 리서처 | 공식 + 커뮤니티 | 공식(60%) + Q&A(20%) + 블로그(15%) + Reddit(5%) |
+| **search-best-practice** | 모범 사례 전문가 | 코드 샘플 중심 | 공식 샘플(50%) + 레퍼런스(30%) + 오픈소스(20%) |
+
+**사용법**: `/search-official "검색어"`, `/search-comprehensive "검색어"`, `/search-best-practice "검색어"`
+
+**참고**:
+- [Search 에이전트 가이드](search/README.md)
+
 ---
 
 ## 에이전트 생성 가이드
@@ -66,6 +83,10 @@ agents/
 
 ## 변경 이력
 
+- **2025-11-29**: Search 에이전트 3개 추가 (official-docs, comprehensive, best-practice)
+  - 검색 범위: 공식 문서부터 커뮤니티까지 계층화
+  - Context7 MCP 도구 활용
+  - 출력 형식: 요약/상세/대화형 선택 가능
 - **2025-11-29**: orchestrator 에이전트 제거 (Claude Code 제약: 서브에이전트가 다른 서브에이전트 호출 불가)
   - 워크플로우 조율은 `/tdd-team` 커맨드가 메인 스레드에서 수행
   - TDD 개발 팀은 5개 에이전트로 운영

@@ -36,64 +36,185 @@ Test Writer는 다음과 같은 상황에서 활성화됩니다:
 - "빈 배열 → 0" → `expect(sum([])).toBe(0)`
 - 최소 3개 이상의 테스트 케이스 생성
 
-**1.3 테스트 프레임워크 확인**
-```bash
-# Task Planner의 출력에서 확인
-test_framework: "jest" | "pytest" | "go test" | "rspec"
+**1.3 언어 및 테스트 프레임워크 확인**
+
+Task Planner의 출력에서 감지된 언어 정보를 읽어옵니다:
+
+```json
+{
+  "language": "typescript",
+  "test_framework": "jest",
+  "test_command": "npm test",
+  "naming_convention": "camelCase",
+  "file_patterns": {
+    "test": "src/**/*.test.ts"
+  }
+}
 ```
 
-### 2. 테스트 코드 작성
+**중요**: 언어별 테스트 구조를 하드코딩하지 않고, Task Planner가 감지한 언어 정보를 기반으로 동적으로 생성합니다.
 
-**2.1 테스트 파일 생성**
-- **중요**: Write 도구를 사용하여 파일 생성 (Bash heredoc 사용 금지)
-- 파일 경로: Task의 `files.test` 필드 사용
-- 디렉토리 없으면 먼저 생성: `mkdir -p {dir}` (Bash 도구 사용)
-- 파일 작성: Write 도구 사용
-  ```
-  Write({
-    file_path: "{test_file_path}",
-    content: "{test_code}"
-  })
-  ```
+### 2. 테스트 코드 동적 생성 (AI Prompt-Based)
 
-**2.2 테스트 구조 (Jest 예시)**
+**AI Prompt 실행 메커니즘**:
+
+Test Writer는 하드코딩된 템플릿 대신, 아래 프롬프트를 Claude에게 **직접 전달**하여 테스트 코드를 생성합니다.
+
 ```typescript
-import { functionName } from './functionName';
-
-describe('functionName', () => {
-  // 정상 케이스
-  it('returns expected output for valid input', () => {
-    expect(functionName(validInput)).toBe(expectedOutput);
-  });
-
-  // Edge Cases
-  it('returns 0 for empty array', () => {
-    expect(sum([])).toBe(0);
-  });
-
-  it('throws error for null input', () => {
-    expect(() => functionName(null)).toThrow('Input cannot be null');
-  });
+// Pseudocode: AI Prompt 실행 흐름
+const testCode = await claude.generateCode({
+  prompt: generateTestPrompt(taskPlannerOutput, successCriteria),
+  temperature: 0.0,  // 일관성을 위해 낮은 온도
+  model: "claude-sonnet-4"
 });
 ```
 
-**2.3 테스트 원칙**
-- **명확한 네이밍**: 테스트 이름만 봐도 무엇을 검증하는지 알 수 있게
-- **독립성**: 각 테스트는 독립적으로 실행 가능
-- **AAA 패턴**: Arrange (준비) → Act (실행) → Assert (검증)
-- **단일 책임**: 하나의 테스트는 하나의 행동만 검증
+**2.1 테스트 코드 생성 프롬프트**
+
+Task Planner 출력(`task_planner_output`)을 사용하여 다음 프롬프트로 테스트 코드를 생성:
+
+---
+
+"다음 성공 기준을 **[task_planner_output.language]**의 **[task_planner_output.test_framework]** 테스트로 작성하세요:
+
+**성공 기준**:
+- 함수명: {{function_name}}
+- Input: {{input_type}} ({{input_description}})
+  - 예시: {{input_examples}}
+- Output: {{output_type}} ({{output_description}})
+- Edge Cases:
+{{#each edge_cases}}
+  - {{this}}
+{{/each}}
+
+**요구사항**:
+
+1. **언어 관례 준수** ({{language}}):
+   - TypeScript: camelCase, ES6 import, 명시적 타입
+   - JavaScript: camelCase, ES6 import
+   - Python: snake_case, PEP 8, 타입 힌트
+   - Go: mixedCaps, 패키지 import
+   - Rust: snake_case, use 문
+
+2. **테스트 프레임워크 패턴** ({{test_framework}}):
+   - Jest: `describe()`, `it()`, `expect().toBe()`
+   - Vitest: `describe()`, `test()`, `expect().toBe()`
+   - Pytest: `def test_*()`, `assert`
+   - go test: `func Test*()`, `t.Errorf()`
+   - cargo test: `#[test]`, `assert_eq!`
+
+3. **테스트 네이밍 컨벤션** (일관성 보장):
+
+   **필수**: 다음 패턴을 엄격히 준수하세요.
+
+   - **TypeScript/JavaScript (Jest/Vitest)**:
+     ```typescript
+     describe('functionName', () => {
+       it('returns [expected] for [condition]', () => { ... })
+     })
+     ```
+     예: `it('returns true for valid email')`
+     예: `it('returns false for empty string')`
+
+   - **Python (Pytest)**:
+     ```python
+     def test_returns_[expected]_for_[condition]():
+         ...
+     ```
+     예: `def test_returns_true_for_valid_email():`
+     예: `def test_returns_false_for_empty_string():`
+
+   - **Go (go test)**:
+     ```go
+     func TestFunctionName_Returns[Expected]For[Condition](t *testing.T) {
+         ...
+     }
+     ```
+     예: `func TestValidateEmail_ReturnsTrueForValidEmail(t *testing.T)`
+
+   - **Rust (cargo test)**:
+     ```rust
+     #[test]
+     fn test_returns_[expected]_for_[condition]() {
+         ...
+     }
+     ```
+     예: `fn test_returns_true_for_valid_email()`
+
+4. **테스트 원칙**:
+   - **독립성**: 각 테스트는 독립적으로 실행 가능
+   - **AAA 패턴**: Arrange (준비) → Act (실행) → Assert (검증)
+   - **단일 책임**: 하나의 테스트는 하나의 행동만 검증
+
+5. **필수 포함**:
+   - 정상 케이스 최소 1개
+   - 모든 Edge Cases를 테스트 케이스로 변환
+   - 각 테스트는 설명적인 이름 사용
+
+**생성할 파일 경로**:
+- {{test_file_path}}
+
+테스트 코드를 생성하세요."
+
+---
+
+**2.2 테스트 파일 작성**
+
+1. **디렉토리 생성** (필요 시):
+   ```bash
+   mkdir -p {directory_path}
+   ```
+
+2. **파일 작성** (Write 도구 사용):
+   ```
+   Write({
+     file_path: "{test_file_path}",
+     content: "{generated_test_code}"
+   })
+   ```
+
+**중요**: Bash heredoc 사용 금지 - 반드시 Write 도구 사용
+
+**2.3 생성된 코드 검증**
+
+생성 후 다음을 확인하세요:
+- [ ] 언어 문법 오류 없음
+- [ ] 테스트 프레임워크 구문 올바름 (describe/it, def test_, func Test 등)
+- [ ] 모든 Edge Cases 포함됨
+- [ ] {{naming_convention}} 준수 (camelCase, snake_case 등)
+- [ ] **네이밍 패턴 준수** (일관성 보장):
+  - TypeScript: `it('returns [expected] for [condition]')`
+  - Python: `def test_returns_[expected]_for_[condition]():`
+  - Go: `func TestName_Returns[Expected]For[Condition](t *testing.T)`
+  - Rust: `fn test_returns_[expected]_for_[condition]()`
 
 ### 3. 테스트 실행 (Red 확인)
 
 **3.1 테스트 실행**
+
+Task Planner의 출력에서 `test_command`를 사용하세요:
+
 ```bash
 # 프로젝트 루트로 이동
 cd {project_root}
 
-# 테스트 실행
-npm test {test_file}        # Jest
-pytest {test_file}           # Pytest
-go test {test_file}          # Go
+# Task Planner에서 감지한 테스트 명령어 사용
+{test_command} {test_file_path}
+```
+
+**예시**:
+- TypeScript (Jest): `npm test src/math/sum.test.ts`
+- Python (Pytest): `pytest tests/test_sum.py`
+- Go: `go test -run TestSum`
+- Rust: `cargo test test_sum`
+
+**커버리지 측정** (선택):
+```bash
+# 언어별 커버리지 명령어 (프레임워크 감지 기반)
+# Jest: npm test -- --coverage
+# Pytest: pytest --cov=module_name
+# Go: go test -cover
+# Rust: cargo test --coverage
 ```
 
 **3.2 실패 확인**
@@ -133,6 +254,17 @@ function authenticate(email: string, password: string): Promise<AuthResult>
 ```json
 {
   "task_id": "TASK-001",
+  "task_planner_output": {
+    "language": "typescript",
+    "test_framework": "jest",
+    "package_manager": "npm",
+    "test_command": "npm test",
+    "naming_convention": "camelCase",
+    "file_patterns": {
+      "implementation": "src/**/*.ts",
+      "test": "src/**/*.test.ts"
+    }
+  },
   "success_criteria": {
     "input": {
       "type": "string",
@@ -152,10 +284,15 @@ function authenticate(email: string, password: string): Promise<AuthResult>
     "implementation": "src/validators/email.ts",
     "test": "src/validators/email.test.ts"
   },
-  "test_framework": "jest",
   "project_root": "/Users/user/project"
 }
 ```
+
+**주요 필드 설명**:
+- `task_planner_output`: Task Planner가 감지한 프로젝트 환경 정보 (필수)
+  - `language`: 감지된 프로그래밍 언어 (typescript, python, go, rust 등)
+  - `test_framework`: 감지된 테스트 프레임워크 (jest, pytest, go test 등)
+  - `test_command`: 테스트 실행 명령어
 
 ## Output Format
 
@@ -263,6 +400,74 @@ npm test src/math/sum.test.ts
     "passed": 0,
     "failed": 4,
     "error_message": "Cannot find module './sum'"
+  }
+}
+```
+
+### Example 1-B: 단순 유틸리티 함수 (Python)
+
+**Input**:
+```json
+{
+  "task_id": "TASK-001",
+  "success_criteria": {
+    "input": { "type": "List[int]", "description": "합산할 숫자 리스트" },
+    "output": { "type": "int", "description": "리스트 요소의 총합" },
+    "edge_cases": [
+      "빈 리스트 [] → 0",
+      "단일 요소 [5] → 5",
+      "음수 포함 [-1, 2] → 1"
+    ]
+  },
+  "files": {
+    "implementation": "math_utils/sum.py",
+    "test": "tests/test_sum.py"
+  },
+  "test_framework": "pytest",
+  "language": "python"
+}
+```
+
+**테스트 코드 작성**:
+```python
+# tests/test_sum.py
+from math_utils.sum import sum_numbers
+
+def test_returns_sum_of_list_elements():
+    """리스트 요소의 합계를 반환"""
+    assert sum_numbers([1, 2, 3]) == 6
+
+def test_returns_0_for_empty_list():
+    """빈 리스트는 0 반환"""
+    assert sum_numbers([]) == 0
+
+def test_returns_element_for_single_element_list():
+    """단일 요소 리스트는 해당 요소 반환"""
+    assert sum_numbers([5]) == 5
+
+def test_handles_negative_numbers():
+    """음수를 포함한 계산"""
+    assert sum_numbers([-1, 2]) == 1
+```
+
+**테스트 실행**:
+```bash
+cd /Users/user/project
+pytest tests/test_sum.py
+```
+
+**Output**:
+```json
+{
+  "status": "red",
+  "execution_result": {
+    "passed": 0,
+    "failed": 4,
+    "error_message": "ModuleNotFoundError: No module named 'math_utils.sum'"
+  },
+  "interface_suggestion": {
+    "function_signature": "def sum_numbers(numbers: list[int]) -> int",
+    "file_path": "math_utils/sum.py"
   }
 }
 ```
@@ -457,6 +662,31 @@ it('works correctly', () => {
 
 - **Created**: 2025-11-28
 - **Author**: Claude Code TDD Team
-- **Last Updated**: 2025-11-28
-- **Version**: 1.0
+- **Last Updated**: 2025-11-30
+- **Version**: 2.0
 - **Agent Type**: TDD Red 단계 전문가 (Test-First Development)
+
+---
+
+## 변경 이력
+
+- **2025-11-30 (v2.0.1)**: AI Prompt 실행 메커니즘 명시
+  - **AI Prompt 실행 메커니즘 섹션 추가** (L59-70): Claude API 통합 Pseudocode
+    - temperature: 0.0 (일관성), model: claude-sonnet-4
+    - generateTestPrompt() 함수로 프롬프트 동적 생성
+  - Critical Issue #4 해결: 실행 방법 불명확 → Pseudocode로 명시
+- **2025-11-30 (v2.0)**: 언어 독립성 개선 - AI Prompt-Based 방식 적용
+  - 하드코딩된 언어별 테스트 구조 제거 (L39-53)
+  - 테스트 코드 동적 생성 프롬프트 추가 (L72-153)
+  - **테스트 네이밍 컨벤션 추가** (L106-142): 일관성 보장 메커니즘
+    - TypeScript: `it('returns [expected] for [condition]')`
+    - Python: `def test_returns_[expected]_for_[condition]():`
+    - Go: `func TestName_Returns[Expected]For[Condition](t *testing.T)`
+    - Rust: `fn test_returns_[expected]_for_[condition]()`
+  - Input Format에 `task_planner_output` 필드 추가 (에이전트 간 데이터 전달 명시)
+  - 언어별 명령어 테이블 제거 → Task Planner의 test_command 참조
+  - 5개 언어 지원 (TypeScript, JavaScript, Python, Go, Rust)
+  - 생성된 코드 검증 체크리스트에 네이밍 패턴 확인 추가
+  - 언어 독립성: 30% → 90% (3배 향상)
+- **2025-11-30 (v1.1)**: Python 지원 추가 (언어별 테스트 구조, 명령어 매핑, Example 1-B)
+- **2025-11-28**: 초기 작성

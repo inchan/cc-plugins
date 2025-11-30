@@ -24,21 +24,53 @@ argument-hint: <feature-description> [requirements...]
 1. `feature_description` = `$ARGUMENTS` 전체
 2. 10자 미만이면 에러 출력 후 종료
 
-### 2. 테스트 프레임워크 감지
+### 2. 언어 및 테스트 프레임워크 감지
 
-1. Read로 `package.json` 확인
-2. Grep으로 `jest|vitest|mocha` 검색
-3. 없으면 설치 안내 후 종료
+**언어 감지 알고리즘**:
+
+**Step 1: TypeScript/JavaScript 확인**
+- Read로 `package.json` 존재 확인
+- Grep으로 devDependencies에서 `jest|vitest|mocha` 검색
+- 발견 시: language="typescript", test_framework={발견된 프레임워크}
+
+**Step 2: Python 확인**
+- Read로 `pyproject.toml` 또는 `requirements.txt` 존재 확인
+- Grep으로 `pytest|unittest` 검색
+- 발견 시: language="python", test_framework={발견된 프레임워크}
+
+**Step 3: 언어 선택**
+- 1개만 감지: 자동 선택
+- 2개 이상 감지: AskUserQuestion으로 사용자 선택 요청
+  ```
+  "프로젝트에서 TypeScript와 Python이 모두 감지되었습니다.
+   TDD로 개발할 언어를 선택하세요."
+  Options: ["TypeScript", "Python"]
+  ```
+- 0개 감지: 설치 안내 후 종료
+
+**프레임워크별 설치 안내**:
+- TypeScript: "npm install --save-dev jest (또는 vitest) 설치 필요"
+- Python: "pip install pytest 설치 필요"
 
 ### 3. Task Planner 호출
 
 ```json
 {
-  "subagent_type": "tdd-developer:tdd-task-planner",
+  "subagent_type": "tdd:tdd-task-planner",
   "description": "작업 분해",
-  "prompt": "{\"feature_description\":\"<$ARGUMENTS>\",\"project_root\":\"<CWD>\",\"max_tasks\":20}"
+  "prompt": "{
+    \"feature_description\":\"<$ARGUMENTS>\",
+    \"project_root\":\"<CWD>\",
+    \"language\":\"<DETECTED_LANGUAGE>\",
+    \"test_framework\":\"<DETECTED_FRAMEWORK>\",
+    \"max_tasks\":20
+  }"
 }
 ```
+
+**변수**:
+- `<DETECTED_LANGUAGE>`: Step 2에서 감지된 언어 ("typescript" | "python")
+- `<DETECTED_FRAMEWORK>`: Step 2에서 감지된 프레임워크 ("jest" | "vitest" | "pytest" | "unittest")
 
 - 응답: `tasks[]` (각 task: id, title, dependencies, files, success_criteria)
 - `total_tasks > 20`이면 AskUserQuestion (첫 20개 / 기능 분할 / 전체 실행)
@@ -121,7 +153,10 @@ TodoWrite로 배치 정보 표시
 <file list>
 
 ## 다음 단계
-npm test && git commit
+
+**언어별 명령어**:
+- TypeScript/JavaScript: `npm test && git commit`
+- Python: `pytest && git commit`
 ```
 
 ---
@@ -132,3 +167,10 @@ npm test && git commit
 - 20개 초과 시 사용자 선택
 - 병렬 실행: Red 단계만, 최대 4개
 - 최대 3회 재시도
+
+---
+
+## 변경 이력
+
+- **2025-11-30**: 언어 독립성 개선 - Python 지원 추가 (언어 감지 알고리즘, Task Planner 호출 확장, 언어별 명령어)
+
