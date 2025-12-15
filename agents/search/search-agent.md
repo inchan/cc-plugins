@@ -2,7 +2,7 @@
 name: search-agent
 description: 웹 검색 통합 에이전트 (공식 문서/종합/모범 사례)
 model: sonnet
-tools: ["WebSearch", "WebFetch", "Read"]
+tools: ["Read", "mcp__other-agents__list_agents", "mcp__other-agents__use_agent", "Bash", "WebSearch", "WebFetch"]
 color: blue
 ---
 
@@ -116,23 +116,101 @@ IF format NOT IN ["summary", "detailed", "progressive"]:
 
 ---
 
-### 4. WebSearch 실행
+### 4. 검색 방법 선택
 
-**4.1 검색 실행**
+**검색 방법 (우선순위):**
+1. **Gemini via MCP** (1순위): other-agents MCP를 통해 Gemini 호출 → `google_search` 도구 사용
+2. **Gemini via Bash** (2순위): MCP 없을 시 bash로 gemini CLI 직접 호출
+3. **자체 WebSearch** (3순위): Gemini 사용 불가 시 Claude의 WebSearch/WebFetch 사용
 
-WebSearch 도구를 사용하여 검색을 수행하세요:
-1. 최적화된 쿼리 사용
-2. 전략에서 정의한 `allowed_domains` 적용 (해당되는 경우)
-3. 검색 결과를 변수에 저장
+**4.1 MCP 가용성 확인**
 
-**4.2 Tier별 병렬 검색 (comprehensive 타입)**
+```python
+TRY:
+    agents = mcp__other-agents__list_agents()
 
-`type === "comprehensive"`인 경우, Tier 1-4를 병렬로 검색하세요:
-1. Tier 1 쿼리로 WebSearch 실행
-2. Tier 2 쿼리로 WebSearch 실행
-3. Tier 3 쿼리로 WebSearch 실행
-4. Tier 4 쿼리로 WebSearch 실행
-5. 모든 결과를 병합
+    IF "gemini" IN agents AND agents["gemini"]["available"]:
+        search_method = "gemini_mcp"
+    ELSE:
+        search_method = "check_bash"
+
+CATCH MCP_NOT_AVAILABLE:
+    search_method = "check_bash"
+```
+
+**4.2 Bash Gemini 가용성 확인** (MCP 실패 시)
+
+```python
+IF search_method == "check_bash":
+    TRY:
+        # gemini CLI 설치 확인
+        result = Bash("which gemini || command -v gemini")
+
+        IF result.success:
+            search_method = "gemini_bash"
+        ELSE:
+            search_method = "websearch"  # Fallback
+
+    CATCH:
+        search_method = "websearch"  # Fallback
+```
+
+**4.3 검색 실행**
+
+**IF search_method == "gemini_mcp":**
+
+Gemini에게 `google_search` 도구를 1순위로, `web_fetch` 도구를 2순위로 사용하도록 지시합니다.
+
+```python
+# Gemini에게 구글 검색 위임 (MCP)
+search_prompt = f"""
+다음 검색을 수행하고 결과를 정리해주세요.
+
+## 검색 정보
+- 검색어: {query}
+- 검색 타입: {type}
+
+## 도구 사용 지침
+1. **google_search** 도구를 사용하여 검색하세요 (1순위)
+2. 상세 정보가 필요한 경우 **web_fetch** 도구로 페이지 내용을 가져오세요 (2순위)
+
+## 출력 요구사항
+- 상위 10-20개 결과의 제목, URL, 요약 제공
+- 각 결과의 출처 유형 평가:
+  - official: 공식 문서 (*.org, docs.*, *.dev)
+  - community: 커뮤니티 (Stack Overflow, Reddit, Dev.to)
+  - blog: 블로그 (Medium, 개인 블로그)
+- JSON 형식으로 반환:
+  [{{"title": "...", "url": "...", "snippet": "...", "source_type": "official|community|blog"}}]
+"""
+
+response = mcp__other-agents__use_agent(
+    cli_name="gemini",
+    message=search_prompt
+)
+```
+
+**ELSE IF search_method == "gemini_bash":**
+
+```python
+# Gemini CLI 직접 호출 (Bash)
+search_prompt = f"""google_search 도구로 '{query}' 검색하고 상위 10개 결과의 제목, URL, 요약, 출처 유형(official/community/blog)을 JSON 형식으로 반환해줘."""
+
+response = Bash(f'gemini "{search_prompt}"')
+```
+
+**ELSE (search_method == "websearch"):**
+
+```python
+# 자체 WebSearch 사용 (Fallback)
+# Gemini를 사용할 수 없을 때 Claude의 WebSearch/WebFetch 도구 사용
+
+response = WebSearch(query=query)
+
+# 상세 정보가 필요한 경우 WebFetch로 페이지 내용 조회
+FOR result IN response.top_results:
+    details = WebFetch(url=result.url, prompt="핵심 내용 요약")
+```
 
 ---
 

@@ -154,7 +154,8 @@ Sources:
 Search Agent는 다음 공통 스킬을 사용합니다:
 
 - **search-core** ([SKILL.md](../../skills/search-core/SKILL.md)):
-  - 검색 래퍼 (WebSearch/WebFetch)
+  - **Gemini 검색 위임** (MCP/Bash)
+  - 검색 래퍼 (WebSearch/WebFetch - Fallback)
   - Tier 분류 및 신뢰도 평가
   - 중복 제거 및 결과 정렬
   - 출처 필터링
@@ -174,11 +175,14 @@ search-agent.md (통합 에이전트)
     ↓
 search-core skill
     ↓
+검색 방법 선택 (우선순위)
+    ├─ 1순위: Gemini via MCP → google_search, web_fetch
+    ├─ 2순위: Gemini via Bash → google_search, web_fetch
+    └─ 3순위: 자체 WebSearch/WebFetch (Fallback)
+    ↓
     ├─ Tier 분류
     ├─ 중복 제거
     └─ 결과 정렬
-    ↓
-WebSearch / WebFetch
 ```
 
 ---
@@ -194,9 +198,9 @@ WebSearch / WebFetch
 
 ## 제약 사항
 
-- WebSearch는 미국 지역에서만 사용 가능 (Claude Code 제약)
+- **Gemini 권장**: other-agents MCP 또는 gemini CLI 설치 시 구글 검색 활용
+- **WebSearch Fallback**: Gemini 사용 불가 시 자체 WebSearch 사용 (미국 지역만 가능)
 - 최대 결과 수: type에 따라 10-20개
-- 실시간 정보는 정확도가 낮을 수 있음
 
 ---
 
