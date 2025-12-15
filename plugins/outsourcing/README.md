@@ -101,8 +101,8 @@ plugins/outsourcing/
 outsourcing-agent
   ↓
 3. MCP 도구 호출
-   - list_available_clis (설치된 CLI 확인)
-   - send_message (작업 전달)
+   - list_agents (설치된 CLI 확인)
+   - use_agent (작업 전달)
   ↓
 4. 응답 처리
    - 요약 생성 (2-3문장)
@@ -188,7 +188,7 @@ def read_root():
 
 ## 제약 사항
 
-- **MCP 서버 필수**: ai-cli-ping-pong MCP 서버가 설치되어 있어야 합니다
+- **MCP 서버 필수**: other-agents MCP 서버가 설치되어 있어야 합니다
 - **CLI 설치 필요**: 사용할 CLI(claude, gemini, codex, qwen)가 로컬에 설치되어 있어야 합니다
 - **Codex Git 제약**: Codex 사용 시 현재 디렉토리가 Git 저장소여야 합니다
 - **v0.1.0 제약**: 단일 CLI 실행만 지원 (병렬 처리 미지원)
@@ -213,16 +213,16 @@ def read_root():
 ### Q: "MCP 서버에 연결할 수 없습니다" 에러
 
 **A**: 다음을 확인하세요:
-1. ai-cli-ping-pong MCP 서버가 실행 중인지 확인
+1. other-agents MCP 서버가 실행 중인지 확인
 2. `~/.claude/settings.json`에 MCP 서버 설정 확인
 
 설정 예시:
 ```json
 {
   "mcpServers": {
-    "ai-cli-ping-pong": {
-      "command": "node",
-      "args": ["/path/to/ai-cli-ping-pong/index.js"]
+    "other-agents": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/other-agents-mcp"]
     }
   }
 }
@@ -281,7 +281,7 @@ MIT License - [../../LICENSE](../../LICENSE) 참고
   - outsourcing-agent 에이전트 추가
   - outsourcing-core 스킬 추가
   - 대화형 CLI 선택 (Claude, Gemini, Codex, Qwen)
-  - MCP 통합 (ai-cli-ping-pong)
+  - MCP 통합 (other-agents)
   - 요약 + 상세 결과 출력 형식
   - CLI별 특징 참고 자료 (cli-capabilities.md)
 

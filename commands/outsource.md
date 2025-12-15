@@ -208,7 +208,7 @@ SQLAlchemy ORM 통합, 비동기 처리, OpenAPI 문서 자동 생성 포함.
 
 ## 제약 사항
 
-- **MCP 서버 필수**: ai-cli-ping-pong MCP 서버가 설치되어 있어야 합니다
+- **MCP 서버 필수**: other-agents MCP 서버가 설치되어 있어야 합니다
 - **CLI 설치 필요**: 선택한 CLI(claude, gemini, codex, qwen)가 로컬에 설치되어 있어야 합니다
 - **Codex Git 제약**: Codex 사용 시 현재 디렉토리가 Git 저장소여야 합니다 (skip_git_repo_check 옵션 없음)
 

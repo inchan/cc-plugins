@@ -2,7 +2,7 @@
 name: outsourcing-agent
 description: MCP를 통해 로컬 AI CLI에 작업을 위임하는 에이전트
 model: sonnet
-tools: ["mcp__ai-cli-ping-pong__list_available_clis", "mcp__ai-cli-ping-pong__send_message", "Read"]
+tools: ["mcp__other-agents__list_agents", "mcp__other-agents__use_agent", "Read"]
 color: purple
 ---
 
@@ -59,10 +59,10 @@ IF selected_cli NOT IN ["claude", "gemini", "codex", "qwen"]:
 
 **2.1 MCP 도구 호출**
 
-`mcp__ai-cli-ping-pong__list_available_clis` 도구를 사용하여 로컬에 설치된 CLI 목록을 확인하세요:
+`mcp__other-agents__list_agents` 도구를 사용하여 로컬에 설치된 CLI 목록을 확인하세요:
 
 ```python
-available_clis = mcp__ai-cli-ping-pong__list_available_clis()
+available_clis = mcp__other-agents__list_agents()
 ```
 
 **2.2 선택된 CLI 검증**
@@ -116,10 +116,10 @@ message = task  # 사용자 작업 그대로 전달
 
 **4.2 MCP 도구 호출**
 
-`mcp__ai-cli-ping-pong__send_message` 도구를 사용하여 CLI에 작업을 전달하세요:
+`mcp__other-agents__use_agent` 도구를 사용하여 CLI에 작업을 전달하세요:
 
 ```python
-response = mcp__ai-cli-ping-pong__send_message(
+response = mcp__other-agents__use_agent(
     cli_name=selected_cli,
     message=message
 )
@@ -136,15 +136,15 @@ IF MCP 연결 실패:
     ERROR: "MCP 서버에 연결할 수 없습니다.
 
     확인 사항:
-    1. ai-cli-ping-pong MCP 서버가 실행 중인지 확인
+    1. other-agents MCP 서버가 실행 중인지 확인
     2. ~/.claude/settings.json에 MCP 서버 설정 확인
 
     설정 예시:
     {
       \"mcpServers\": {
-        \"ai-cli-ping-pong\": {
-          \"command\": \"node\",
-          \"args\": [\"/path/to/ai-cli-ping-pong/index.js\"]
+        \"other-agents\": {
+          \"command\": \"npx\",
+          \"args\": [\"-y\", \"@anthropic/other-agents-mcp\"]
         }
       }
     }
@@ -322,5 +322,5 @@ if __name__ == "__main__":
 ## 참고 자료
 
 - **CLI 특징**: skills/outsourcing-core/resources/cli-capabilities.md
-- **MCP 서버 문서**: ai-cli-ping-pong 저장소 README.md
+- **MCP 서버 문서**: other-agents MCP 서버 README.md
 - **커맨드 문서**: commands/outsource.md

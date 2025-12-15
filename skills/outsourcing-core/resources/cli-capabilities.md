@@ -151,7 +151,7 @@
 
 ⚠️ **Git 저장소 필수**: Codex는 Git 저장소 내에서만 작동합니다.
 - 현재 디렉토리가 Git 저장소가 아니면 에러 발생
-- `skip_git_repo_check` 옵션은 ai-cli-ping-pong MCP에서 지원하지만 권장하지 않음
+- `skip_git_repo_check` 옵션은 other-agents MCP에서 지원하지만 권장하지 않음
 
 ---
 

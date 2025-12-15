@@ -66,10 +66,10 @@ ELSE:
 
 이 스킬은 다음 MCP 도구를 사용합니다:
 
-1. `mcp__ai-cli-ping-pong__list_available_clis`
+1. `mcp__other-agents__list_agents`
    - 로컬에 설치된 CLI 목록 확인
 
-2. `mcp__ai-cli-ping-pong__send_message`
+2. `mcp__other-agents__use_agent`
    - 선택된 CLI에 작업 전달
    - 응답 수신
 
@@ -79,7 +79,7 @@ ELSE:
 
 | 에러 | 원인 | 해결 방법 |
 |------|------|----------|
-| MCP 연결 실패 | ai-cli-ping-pong 미실행 | MCP 서버 시작 안내 |
+| MCP 연결 실패 | other-agents 미실행 | MCP 서버 시작 안내 |
 | CLI 미설치 | 선택한 CLI 없음 | 설치 가이드 제공 |
 | Git 저장소 에러 | Codex는 Git 필요 | 다른 CLI 추천 |
 | API 키 오류 | 환경 변수 미설정 | 설정 방법 안내 |
@@ -129,7 +129,7 @@ ELSE:
 
 - **v0.1.0**: 단일 CLI 실행만 지원 (병렬 처리 미지원)
 - **v0.1.0**: 복잡도 자동 계산 미지원 (사용자 선택)
-- **MCP 필수**: ai-cli-ping-pong MCP 서버 설치 필요
+- **MCP 필수**: other-agents MCP 서버 설치 필요
 - **CLI 설치 필요**: 사용할 CLI가 로컬에 설치되어 있어야 함
 
 ---
