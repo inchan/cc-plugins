@@ -248,9 +248,9 @@ def read_root():
 
 ### 상세 문서
 
-- [Outsourcing Agent 개요](../../agents/outsourcing/outsourcing-agent.md)
-- [CLI 특징 비교](../../skills/outsourcing-core/resources/cli-capabilities.md)
-- [outsourcing-core 스킬](../../skills/outsourcing-core/SKILL.md)
+- [Outsourcing Agent](./agents/outsourcing-agent.md)
+- [CLI 특징 비교](./skills/outsourcing-core/resources/cli-capabilities.md)
+- [outsourcing-core 스킬](./skills/outsourcing-core/SKILL.md)
 
 ### 개발 가이드
 

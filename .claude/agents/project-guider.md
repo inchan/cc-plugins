@@ -158,4 +158,4 @@ Task subagent_type="claude-code-guide" prompt="<사용자 질문>"
 - Commands: `/docs/references/commands/`
 
 ### 템플릿
-- All templates: `/templates/`
+- All templates: `/docs/templates/`

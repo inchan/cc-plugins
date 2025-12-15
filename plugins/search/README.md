@@ -276,11 +276,11 @@ search-core skill
 
 ### 상세 문서
 
-- [Search Agent 개요](../../agents/search/README.md)
-- [공식 문서 전략](../../agents/search/resources/official-docs-strategy.md)
-- [종합 검색 전략](../../agents/search/resources/comprehensive-strategy.md)
-- [모범 사례 전략](../../agents/search/resources/best-practice-strategy.md)
-- [search-core 스킬](../../skills/search-core/SKILL.md)
+- [Search Agent 개요](./agents/README.md)
+- [공식 문서 전략](./agents/resources/official-docs-strategy.md)
+- [종합 검색 전략](./agents/resources/comprehensive-strategy.md)
+- [모범 사례 전략](./agents/resources/best-practice-strategy.md)
+- [search-core 스킬](./skills/search-core/SKILL.md)
 
 ### 개발 가이드
 

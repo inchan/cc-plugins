@@ -56,18 +56,21 @@ npm run validate
 
 ```
 cc-plugins/
-├── agents/                # 서브에이전트 (TDD 개발 팀 5개)
-├── commands/              # 슬래시 커맨드
-├── skills/                # 확장 스킬
-├── hooks/                 # 이벤트 훅
-├── rules/                 # 활성화 규칙
+├── plugins/               # 플러그인 (핵심)
+│   ├── base/              # 공통 에이전트 (engineer)
+│   ├── tdd/               # TDD 개발 팀 (5개 에이전트)
+│   ├── search/            # 웹 검색 통합
+│   ├── doc-tools/         # 문서 관리
+│   └── outsourcing/       # AI CLI 위임
+├── tests/                 # 테스트 (중앙집중식)
 ├── docs/                  # 프로젝트 문서
 │   ├── guidelines/        # 개발 가이드라인
-│   └── references/        # 레퍼런스 패턴
+│   ├── references/        # 레퍼런스 패턴
+│   └── templates/         # 컴포넌트 템플릿
 └── .claude-plugin/        # 플러그인 메타데이터
 ```
 
-각 디렉토리 상세 구조는 해당 디렉토리의 README.md 참고
+각 플러그인 상세 구조는 `plugins/{name}/README.md` 참고
 
 ---
 
@@ -123,6 +126,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참고
 
 ## 변경 이력
 
+- **2025-12-15**: 프로젝트 구조 섹션 업데이트 (플러그인 기반 구조 반영)
 - **2025-12-01**: 문서 업데이트 자동화 도구 추가
   - `/doc-update` 커맨드 추가 (문서-코드 불일치 자동 탐지/수정)
   - `doc-updater` 에이전트 추가 (haiku 모델 기반, 4가지 원칙)

@@ -9,7 +9,7 @@
   },
   "plugins": [
     {
-      "name": "cc-plugins",
+      "name": "inchan - all",
       "version": "0.1.0",
       "description": "모든 스킬, 에이전트, 명령어를 포함하는 통합 플러그인",
       "author": {
@@ -18,41 +18,45 @@
       },
       "source": "./",
       "skills": [
-        "./skills/search-core/SKILL.md",
-        "./skills/outsourcing-core/SKILL.md"
+        "./plugins/search/skills/search-core/SKILL.md",
+        "./plugins/outsourcing/skills/outsourcing-core/SKILL.md"
       ],
       "commands": [
-        "./commands/tdd-team.md",
-        "./commands/search.md",
-        "./commands/doc-update.md",
-        "./commands/outsource.md"
+        "./plugins/tdd/commands/tdd-team.md",
+        "./plugins/search/commands/search.md",
+        "./plugins/doc-tools/commands/doc-update.md",
+        "./plugins/outsourcing/commands/outsource.md"
       ],
       "agents": [
-        "./agents/engineer.md",
-        "./agents/tdd/task-planner.md",
-        "./agents/tdd/test-writer.md",
-        "./agents/tdd/implementer.md",
-        "./agents/tdd/refactorer.md",
-        "./agents/tdd/reviewer.md",
-        "./agents/search/search-agent.md",
-        "./agents/doc-tools/doc-updater.md",
-        "./agents/outsourcing/outsourcing-agent.md"
+        "./plugins/base/agents/engineer.md",
+        "./plugins/tdd/agents/task-planner.md",
+        "./plugins/tdd/agents/test-writer.md",
+        "./plugins/tdd/agents/implementer.md",
+        "./plugins/tdd/agents/refactorer.md",
+        "./plugins/tdd/agents/reviewer.md",
+        "./plugins/search/agents/search-agent.md",
+        "./plugins/doc-tools/agents/doc-updater.md",
+        "./plugins/outsourcing/agents/outsourcing-agent.md"
       ]
     },
     {
-      "name": "tdd",
+      "name": "inchan - base",
+      "source": "./plugins/base"
+    },
+    {
+      "name": "inchan - tdd",
       "source": "./plugins/tdd"
     },
     {
-      "name": "search",
+      "name": "inchan - search",
       "source": "./plugins/search"
     },
     {
-      "name": "doc-tools",
+      "name": "inchan - doc-tools",
       "source": "./plugins/doc-tools"
     },
     {
-      "name": "outsourcing",
+      "name": "inchan - outsourcing",
       "source": "./plugins/outsourcing"
     }
   ]

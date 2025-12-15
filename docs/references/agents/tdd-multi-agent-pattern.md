@@ -537,12 +537,12 @@ Red → Green → Refactor
 ## 관련 문서
 
 - [TDD Orchestrator 가이드](./tdd-orchestrator-guide.md) (참조용)
-- [Task Planner](../../../agents/tdd/task-planner.md)
-- [Test Writer](../../../agents/tdd/test-writer.md)
-- [Implementer](../../../agents/tdd/implementer.md)
-- [Refactorer](../../../agents/tdd/refactorer.md)
-- [Reviewer](../../../agents/tdd/reviewer.md)
-- [/tdd-team 커맨드](../../../commands/tdd-team.md)
+- [Task Planner](../../../plugins/tdd/agents/task-planner.md)
+- [Test Writer](../../../plugins/tdd/agents/test-writer.md)
+- [Implementer](../../../plugins/tdd/agents/implementer.md)
+- [Refactorer](../../../plugins/tdd/agents/refactorer.md)
+- [Reviewer](../../../plugins/tdd/agents/reviewer.md)
+- [/tdd-team 커맨드](../../../plugins/tdd/commands/tdd-team.md)
 - [개발 가이드라인](../../guidelines/development.md)
 
 ---

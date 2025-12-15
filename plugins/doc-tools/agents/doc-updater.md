@@ -26,6 +26,26 @@ color: purple
 }
 ```
 
+## Constants (상수 정의)
+
+다음 상수는 검증 로직에서 사용됩니다:
+
+| 상수명 | 값 | 설명 |
+|--------|-----|------|
+| `SIMILARITY_THRESHOLD` | 0.8 | 중복 문서 판정 임계값 (80%) |
+| `MIN_CONTENT_LENGTH` | 50 | 최소 문서 길이 (자) |
+| `BATCH_SIZE` | 10 | 배치 처리 단위 |
+
+```typescript
+const CONSTANTS = {
+  SIMILARITY_THRESHOLD: 0.8,    // 80% 이상 유사하면 중복으로 판정
+  MIN_CONTENT_LENGTH: 50,       // 50자 미만은 빈 문서로 간주
+  BATCH_SIZE: 10                // 한 번에 처리할 파일 수
+};
+```
+
+---
+
 ## Instructions
 
 ### 1. Input 파싱 및 검증
@@ -135,7 +155,7 @@ FOR EACH file IN files:
        content2 = Read(pair[1])
        similarity = calculateSimilarity(content1, content2)
 
-       IF similarity > 0.8:  // 80% 이상 겹침
+       IF similarity > CONSTANTS.SIMILARITY_THRESHOLD:  // 80% 이상 겹침
            ISSUE: "중복 정보: {pair[0]} ↔ {pair[1]} ({similarity*100}% 유사)"
            SUGGESTION: "하나는 참조로 변경 권장"
    ```
@@ -201,7 +221,7 @@ FOR EACH file IN files:
 1. **빈 문서**
 
    ```
-   IF content.trim().length < 50:
+   IF content.trim().length < CONSTANTS.MIN_CONTENT_LENGTH:  // 50자 미만
        ISSUE: "빈 문서 또는 내용 부족"
    ```
 
@@ -346,6 +366,9 @@ interface DocumentUpdaterInput {
 
 ## 변경 이력
 
+- **2025-12-15**: 문서 개선
+  - Constants 섹션 추가 (SIMILARITY_THRESHOLD, MIN_CONTENT_LENGTH, BATCH_SIZE)
+  - 매직 넘버를 상수 참조로 변경
 - **2025-11-30**: 초기 생성
   - 4가지 원칙 기반 문서 검증 (교차검증/추적가능성/사용자중심/완성도)
   - 자동 수정 기능 (일부 항목)

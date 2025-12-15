@@ -328,7 +328,7 @@ doc-updater 에이전트 호출
 
 - [/doc-update 커맨드](../commands/doc-update-pattern.md)
 - [문서 작성 가이드](../../guidelines/documentation.md)
-- [agents/doc-tools/doc-updater.md](../../../agents/doc-tools/doc-updater.md) - 에이전트 프롬프트
+- [doc-updater 에이전트](../../../plugins/doc-tools/agents/doc-updater.md)
 
 ---
 

@@ -252,7 +252,6 @@ claude
 
 - [Agents Reference](../agents/)
 - [Commands Reference](../commands/)
-- [Hooks Reference](../hooks/)
 - [공식 플러그인 README](https://github.com/anthropics/claude-code/tree/main/plugins/README.md)
 
 ---

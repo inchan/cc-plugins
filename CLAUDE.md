@@ -112,20 +112,21 @@ npm run build
 
 ```
 cc-plugins/
-├── agents/                # 서브에이전트 (TDD 개발 팀 5개)
-│   └── tdd/              # task-planner, test-writer, implementer, refactorer, reviewer
-├── commands/              # 슬래시 커맨드 (tdd-team)
-├── skills/                # 확장 스킬
-├── hooks/                 # 이벤트 훅
-├── rules/                 # 활성화 규칙
-├── templates/             # 컴포넌트 템플릿
-├── docs/                  # 프로젝트 문서
-│   ├── guidelines/        # 개발 가이드라인 (필수)
-│   └── references/        # 레퍼런스 패턴
-└── .claude-plugin/        # 플러그인 메타데이터 (marketplace.json)
+├── plugins/               # 플러그인 (핵심)
+│   ├── base/              # 공통 에이전트 (engineer)
+│   ├── tdd/               # TDD 개발 팀 (5개 에이전트)
+│   ├── search/            # 웹 검색 통합
+│   ├── doc-tools/         # 문서 관리
+│   └── outsourcing/       # AI CLI 위임
+├── tests/                 # 테스트 (중앙집중식)
+├── docs/                  # 문서 및 템플릿
+│   ├── guidelines/        # 개발 가이드라인
+│   ├── references/        # 레퍼런스 패턴
+│   └── templates/         # 컴포넌트 템플릿
+└── .claude-plugin/        # 플러그인 메타데이터
 ```
 
-각 디렉토리 상세 구조는 해당 디렉토리의 README.md 참고
+각 플러그인 상세 구조는 `plugins/{name}/README.md` 참고
 
 ---
 
@@ -144,6 +145,12 @@ cc-plugins/
 
 ## 변경 이력
 
+- **2025-12-15**: 플러그인 기반 구조로 전환
+  - `agents/`, `commands/`, `skills/` 인덱스 폴더 삭제
+  - `rules/`, `hooks/` 폴더 삭제 (미사용)
+  - `shared/` → `plugins/base/`로 이동
+  - `templates/` → `docs/templates/`로 이동
+  - 프로젝트 구조 섹션 업데이트
 - **2025-11-29**: 프로젝트 구조 최신화 (TDD 개발 팀 5개 에이전트 반영)
 - **2025-11-29**: 워크플로우 섹션 간소화 - workflows.md 참조로 변환
 - **2025-11-28**: QUICK_START.md 참조 제거 (파일 삭제됨)

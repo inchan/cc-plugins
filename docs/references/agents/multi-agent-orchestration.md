@@ -308,8 +308,8 @@ def handle_partial_failure(results):
 
 ## 관련 문서
 
-- [Agent Template](../../../templates/agents/agent.md.template)
-- [Agents README](../../../agents/README.md)
+- [Agent Template](../../templates/agents/agent.md.template)
+- [Plugins](../../../plugins/) - 플러그인별 에이전트 참조
 
 ---
 

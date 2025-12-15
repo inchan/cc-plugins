@@ -1,0 +1,12 @@
+{
+    "name": "base",
+    "version": "1.0.0",
+    "description": "공통 에이전트 및 유틸리티를 제공하는 기본 플러그인",
+    "author": {
+        "name": "inchan",
+        "url": "https://github.com/inchan"
+    },
+    "agents": [
+        "./agents/engineer.md"
+    ]
+}

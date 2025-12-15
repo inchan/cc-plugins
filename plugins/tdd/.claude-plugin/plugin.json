@@ -7,13 +7,13 @@
         "url": "https://github.com/inchan"
     },
     "commands": [
-        "./../../commands/tdd-team.md"
+        "./commands/tdd-team.md"
     ],
     "agents": [
-        "./../../agents/tdd/task-planner.md",
-        "./../../agents/tdd/test-writer.md",
-        "./../../agents/tdd/implementer.md",
-        "./../../agents/tdd/refactorer.md",
-        "./../../agents/tdd/reviewer.md"
+        "./agents/task-planner.md",
+        "./agents/test-writer.md",
+        "./agents/implementer.md",
+        "./agents/refactorer.md",
+        "./agents/reviewer.md"
     ]
 }

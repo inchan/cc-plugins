@@ -7,12 +7,12 @@
         "url": "https://github.com/inchan"
     },
     "skills": [
-        "./../../skills/outsourcing-core/SKILL.md"
+        "./skills/outsourcing-core/SKILL.md"
     ],
     "commands": [
-        "./../../commands/outsource.md"
+        "./commands/outsource.md"
     ],
     "agents": [
-        "./../../agents/outsourcing/outsourcing-agent.md"
+        "./agents/outsourcing-agent.md"
     ]
 }

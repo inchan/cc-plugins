@@ -94,7 +94,29 @@ ELSE IF path가 파일:
 
 ### 3. doc-updater 에이전트 호출
 
-**3.1 Task 도구 호출**
+**3.1 배치 처리 (10개 단위)**
+
+```
+BATCH_SIZE = 10
+
+batches = []
+FOR i = 0 TO files.length STEP BATCH_SIZE:
+    batch = files.slice(i, i + BATCH_SIZE)
+    batches.push(batch)
+
+all_issues = []
+all_summary = { total_files: 0, issues_found: 0, fixes_applied: 0, failed_files: 0 }
+
+FOR EACH batch IN batches:
+    result = Task(doc-tools:doc-updater, batch)
+    all_issues.push(...result.issues)
+    all_summary.total_files += result.summary.total_files
+    all_summary.issues_found += result.summary.issues_found
+    all_summary.fixes_applied += result.summary.fixes_applied
+    all_summary.failed_files += result.summary.failed_files
+```
+
+**3.2 Task 도구 호출**
 
 ```json
 {
@@ -109,7 +131,7 @@ ELSE IF path가 파일:
 }
 ```
 
-**3.2 에이전트 응답 형식**
+**3.3 에이전트 응답 형식**
 
 ```json
 {
@@ -283,6 +305,8 @@ interface DocUpdateInput {
 
 ## 변경 이력
 
+- **2025-12-15**: 문서 개선
+  - 배치 처리 로직 상세화 (10개 단위 처리 알고리즘 추가)
 - **2025-11-30**: 초기 생성
   - 추적가능성/교차검증/사용자중심/완성도 검증
   - doc-updater 에이전트 연동

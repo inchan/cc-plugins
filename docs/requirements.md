@@ -212,8 +212,8 @@ rules/
                       ↓
 ┌─────────────────────────────────────────────────────────┐
 │ 4. 영향받는 문서 업데이트                                 │
-│    - dev-guidelines.md                                  │
-│    - TOOL-CREATION-GUIDE.md                             │
+│    - guidelines/development.md                          │
+│    - guidelines/tool-creation.md                        │
 │    - 기타 관련 문서                                       │
 └─────────────────────┬───────────────────────────────────┘
                       ↓
@@ -256,6 +256,7 @@ rules/
 
 ## 변경 이력
 
+- **2025-12-15**: 업데이트 프로세스의 파일명 참조 수정 (dev-guidelines.md → guidelines/development.md)
 - **2025-11-29**: 프로젝트 구조 섹션 참조로 변환 (CLAUDE.md 참조) - 중복 제거
 - **2025-11-28**: instruction.md로부터 요구사항 도출 및 문서 생성
 - **2025-11-28**: 업데이트 흐름 및 프로세스 명시

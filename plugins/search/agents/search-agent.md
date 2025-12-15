@@ -364,9 +364,9 @@ Sources:
 - [공식 문서 전략](resources/official-docs-strategy.md)
 - [종합 검색 전략](resources/comprehensive-strategy.md)
 - [모범 사례 전략](resources/best-practice-strategy.md)
-- [search-core 스킬](../../skills/search-core/SKILL.md)
-- [출력 형식 가이드](../../skills/search-core/resources/output-formats.md)
-- [출처 필터링 가이드](../../skills/search-core/resources/source-filters.md)
+- [search-core 스킬](../skills/search-core/SKILL.md)
+- [출력 형식 가이드](../skills/search-core/resources/output-formats.md)
+- [출처 필터링 가이드](../skills/search-core/resources/source-filters.md)
 
 ---
 

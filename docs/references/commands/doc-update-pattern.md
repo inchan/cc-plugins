@@ -212,9 +212,9 @@ git diff로 변경사항을 확인한 후 커밋하세요.
 
 ## 관련 문서
 
-- [doc-updater 에이전트](../../agents/doc-updater-agent-pattern.md)
+- [doc-updater 에이전트 패턴](../agents/doc-updater-agent-pattern.md)
 - [문서 작성 가이드](../../guidelines/documentation.md)
-- [commands/doc-update.md](../../../commands/doc-update.md) - 구현 명세
+- [doc-update 커맨드](../../../plugins/doc-tools/commands/doc-update.md)
 
 ---
 

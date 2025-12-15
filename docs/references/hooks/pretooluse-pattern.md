@@ -262,8 +262,7 @@ echo '{"tool_name":"Bash","tool_input":{"command":"grep x y"}}' | python hook.py
 
 ## 관련 문서
 
-- [Hooks README](../../../hooks/README.md)
-- [Hook Template](../../../templates/hooks/hook.py.template)
+- [Hook Template](../../templates/hooks/hook.py.template)
 - [공식 예제](https://github.com/anthropics/claude-code/tree/main/examples/hooks)
 
 ---

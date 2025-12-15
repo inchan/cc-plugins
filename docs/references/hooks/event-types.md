@@ -110,7 +110,7 @@
 ## 관련 문서
 
 - [PreToolUse Pattern](./pretooluse-pattern.md)
-- [Hooks README](../../../hooks/README.md)
+- [공식 Hooks 예제](https://github.com/anthropics/claude-code/tree/main/examples/hooks)
 
 ---
 

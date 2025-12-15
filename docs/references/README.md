@@ -48,18 +48,18 @@ references/
 1. [PreToolUse Pattern](./hooks/pretooluse-pattern.md) 읽기
 2. [Event Types](./hooks/event-types.md)에서 이벤트 확인
 3. [공식 예제 코드](./examples/bash-command-validator.py) 참고
-4. [Hook Template](../../templates/hooks/hook.py.template) 사용
+4. [Hook Template](../templates/hooks/hook.py.template) 사용
 
 ### 새로운 Agent 개발 시
 
 1. [Multi-Agent Orchestration](./agents/multi-agent-orchestration.md) 패턴 학습
-2. [Agent Template](../../templates/agents/agent.md.template) 사용
-3. code-review 플러그인 구조 참고
+2. [Agent Template](../templates/agents/agent.md.template) 사용
+3. plugins/tdd 플러그인 구조 참고
 
 ### 새로운 Command 개발 시
 
 1. [Slash Command Pattern](./commands/slash-command-pattern.md) 읽기
-2. [Command Template](../../templates/commands/command.md.template) 사용
+2. [Command Template](../templates/commands/command.md.template) 사용
 3. 파라미터 처리 패턴 참고
 
 ### 새로운 Plugin 개발 시
@@ -148,7 +148,7 @@ references/{타입}/README.md 확인
 ### 3. 템플릿 활용
 
 ```
-templates/{타입}/ 에서 템플릿 복사
+docs/templates/{타입}/ 에서 템플릿 복사
     ↓
 레퍼런스 패턴 적용
     ↓
@@ -220,12 +220,13 @@ templates/{타입}/ 에서 템플릿 복사
 - [공식 소스 조사 결과](../research/official-sources-research.md)
 - [Requirements](../requirements.md)
 - [Workflows](../workflows.md)
-- [Templates](../../templates/)
+- [Templates](../templates/)
 
 ---
 
 ## 변경 이력
 
+- **2025-12-15**: 참조 예시 업데이트 (code-review → plugins/tdd 플러그인)
 - **2025-11-28**: 질문별 빠른 검색 테이블 추가 (QUICK_START.md에서 이동)
 - **2025-11-28**: 초기 레퍼런스 구조 생성
 - **2025-11-28**: 공식 예제 기반 4개 카테고리 레퍼런스 작성

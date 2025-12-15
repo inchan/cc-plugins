@@ -83,4 +83,4 @@ DRY 원칙(P3): 3번 반복 시 중복 제거
 - Commands patterns: `/docs/references/commands/`
 
 **템플릿:**
-- Skills, Hooks, Agents, Commands: `/templates/`
+- Skills, Hooks, Agents, Commands: `/docs/templates/`

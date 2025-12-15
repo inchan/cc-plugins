@@ -308,9 +308,9 @@ Combine the results and present them to the user.
 
 ## 관련 문서
 
-- [Commands README](../../../commands/README.md)
-- [Command Template](../../../templates/commands/command.md.template)
+- [Command Template](../../templates/commands/command.md.template)
 - [Agents Orchestration](../agents/multi-agent-orchestration.md)
+- [Plugins](../../../plugins/) - 플러그인별 커맨드 참조
 
 ---
 

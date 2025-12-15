@@ -75,7 +75,7 @@ Search Agent는 3가지 검색 전략(공식 문서/종합/모범 사례)을 하
 | **Tier 3** | 신뢰 커뮤니티 | 50-69점 | Stack Overflow, Reddit |
 | **Tier 4** | 일반 커뮤니티 | 30-49점 | Medium, Dev.to, 개인 블로그 |
 
-상세 내용: [출처 필터링 가이드](../../skills/search-core/resources/source-filters.md)
+상세 내용: [출처 필터링 가이드](../skills/search-core/resources/source-filters.md)
 
 ---
 
@@ -123,7 +123,7 @@ Sources:
 - [모든 URL]
 ```
 
-상세 내용: [출력 형식 가이드](../../skills/search-core/resources/output-formats.md)
+상세 내용: [출력 형식 가이드](../skills/search-core/resources/output-formats.md)
 
 ---
 
@@ -153,7 +153,7 @@ Sources:
 
 Search Agent는 다음 공통 스킬을 사용합니다:
 
-- **search-core** ([SKILL.md](../../skills/search-core/SKILL.md)):
+- **search-core** ([SKILL.md](../skills/search-core/SKILL.md)):
   - **Gemini 검색 위임** (MCP/Bash)
   - 검색 래퍼 (WebSearch/WebFetch - Fallback)
   - Tier 분류 및 신뢰도 평가
@@ -208,7 +208,7 @@ search-core skill
 
 - [Tool Creation Guide](../../docs/guidelines/tool-creation.md)
 - [Sub-agents 공식 문서](https://docs.anthropic.com/claude-code/agents)
-- [search-core 스킬](../../skills/search-core/SKILL.md)
+- [search-core 스킬](../skills/search-core/SKILL.md)
 
 ---
 

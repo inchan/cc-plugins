@@ -7,12 +7,12 @@
         "url": "https://github.com/inchan"
     },
     "skills": [
-        "./../../skills/search-core/SKILL.md"
+        "./skills/search-core/SKILL.md"
     ],
     "commands": [
-        "./../../commands/search.md"
+        "./commands/search.md"
     ],
     "agents": [
-        "./../../agents/search/search-agent.md"
+        "./agents/search-agent.md"
     ]
 }
